@@ -12,7 +12,22 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useHistory } from "react-router-dom";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
 // import { Button } from "@mui/material";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "rgba(224, 223, 224, 255)",
+    },
+    typography: {
+      allVariants: {
+        color: "black",
+      },
+    },
+  },
+});
 
 export default function AppBanner() {
   const { auth } = useContext(AuthContext);
@@ -111,44 +126,46 @@ export default function AppBanner() {
   }
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography
-            variant="h4"
-            noWrap
-            component="div"
-            sx={{ display: { xs: "none", sm: "block" } }}
-          >
-            <Link
-              onClick={() => {
-                if (auth.loggedIn) {
-                  store.closeCurrentList();
-                }
-              }}
-              style={{ textDecoration: "none", color: "white" }}
-              to={"/"}
+    <ThemeProvider theme={theme}>
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography
+              variant="h4"
+              noWrap
+              component="div"
+              sx={{ display: { xs: "none", sm: "block" } }}
             >
-              T<sup>5</sup>L
-            </Link>
-          </Typography>
-          <Box sx={{ flexGrow: 1 }}>{editToolbar}</Box>
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              {getAccountMenu(auth.loggedIn)}
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      {menu}
-    </Box>
+              <Link
+                onClick={() => {
+                  if (auth.loggedIn) {
+                    store.closeCurrentList();
+                  }
+                }}
+                style={{ textDecoration: "none" }}
+                to={"/"}
+              >
+                T<sup>5</sup>L
+              </Link>
+            </Typography>
+            <Box sx={{ flexGrow: 1 }}></Box>
+            <Box sx={{ display: { xs: "none", md: "flex" } }}>
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls={menuId}
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+              >
+                {getAccountMenu(auth.loggedIn)}
+              </IconButton>
+            </Box>
+          </Toolbar>
+        </AppBar>
+        {menu}
+      </Box>
+    </ThemeProvider>
   );
 }

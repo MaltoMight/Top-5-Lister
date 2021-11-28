@@ -36,29 +36,13 @@ const HomeScreen = () => {
     );
   }
 
-  function statusManager() {
-    if (store.isListNameEditActive) {
-      return true;
-    } else return false;
-  }
   if (store.listMarkedForDeletion) {
     return <DeleteModal />;
   } else {
     return (
       <div id="top5-list-selector">
-        <div id="list-selector-heading">
-          <Fab
-            disabled={statusManager()}
-            color="primary"
-            aria-label="add"
-            id="add-list-button"
-            onClick={handleCreateNewList}
-          >
-            <AddIcon />
-          </Fab>
-          <Typography variant="h2">Your Lists</Typography>
-        </div>
-        <div id="list-selector-list">{listCard}</div>
+        <div id="list-selector-heading"></div>
+        <div id="list-selector-list">{}</div>
       </div>
     );
   }

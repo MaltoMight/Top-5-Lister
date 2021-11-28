@@ -51,6 +51,7 @@ function AuthContextProvider(props) {
           loggedIn: false,
         });
       }
+
       default:
         return auth;
     }
