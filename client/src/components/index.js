@@ -5,12 +5,13 @@ import HomeWrapper from "./HomeWrapper";
 import ListCard from "./ListCard";
 import RegisterScreen from "./RegisterScreen";
 import SplashScreen from "./SplashScreen";
-import Statusbar from "./Statusbar";
+import StatusBar from "./StatusBar";
 import Top5Item from "./Top5Item";
 import WorkspaceScreen from "./WorkspaceScreen";
 import LoginScreen from "./LoginScreen";
 import CommunityScreen from "./Community/CommunityScreen";
 import MenuBar from "./MenuBar/MenuBar";
+
 /*
     This serves as a module so that we can import
     all the other components as we wish.
@@ -25,7 +26,7 @@ export {
   ListCard,
   RegisterScreen,
   SplashScreen,
-  Statusbar,
+  StatusBar,
   Top5Item,
   WorkspaceScreen,
   LoginScreen,
