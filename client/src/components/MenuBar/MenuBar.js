@@ -50,6 +50,32 @@ export default function MenuBar() {
   if (auth.loggedIn) {
     homeIconText = "enabled";
   }
+  function iconClassName(number) {
+    if (
+      (location.pathname === "/" || location.pathname === "/") &&
+      number === 1
+    ) {
+      return "selectedIcon";
+    } else if (
+      (location.pathname === "/all" || location.pathname === "/group/") &&
+      number === 2
+    ) {
+      return "selectedIcon";
+    } else if (
+      (location.pathname === "/user" || location.pathname === "/user/") &&
+      number === 3
+    ) {
+      return "selectedIcon";
+    } else if (
+      (location.pathname === "/community" ||
+        location.pathname === "/community/") &&
+      number === 4
+    ) {
+      return "selectedIcon";
+    } else {
+      return "non-selectedIcon";
+    }
+  }
 
   function menuBar() {
     console.log("location:", location);
@@ -60,19 +86,29 @@ export default function MenuBar() {
     let homeIcon;
     if (
       location.pathname === "/community/" ||
-      location.pathname === "/community"
+      location.pathname === "/community" ||
+      location.pathname === "/all" ||
+      location.pathname === "/all/" ||
+      location.pathname === "/user" ||
+      location.pathname === "/user/"
     ) {
       console.log("valid");
       valid = true;
     } else if (location.pathname === "/" && auth.loggedIn) {
       console.log("valid");
       valid = true;
+    } else if (auth.loggedIn) {
+      valid = true;
     }
     if (auth.loggedIn) {
       homeIconText = "enabled";
       homeIcon = (
         <Link to="/">
-          <HomeIcon color={homeIconText} style={{ fontSize: "30pt" }} />
+          <HomeIcon
+            className={iconClassName(1)}
+            color={homeIconText}
+            style={{ fontSize: "30pt" }}
+          />
         </Link>
       );
     } else {
@@ -87,13 +123,31 @@ export default function MenuBar() {
               <Grid item></Grid>
               <Grid item>{homeIcon}</Grid>
               <Grid item>
-                <GroupsIcon color="enabled" style={{ fontSize: "30pt" }} />
+                <Link to="/all">
+                  <GroupsIcon
+                    className={iconClassName(2)}
+                    color="enabled"
+                    style={{ fontSize: "30pt" }}
+                  />
+                </Link>
               </Grid>
               <Grid item>
-                <PersonIcon color="enabled" style={{ fontSize: "30pt" }} />
+                <Link to="/user">
+                  <PersonIcon
+                    className={iconClassName(3)}
+                    color="enabled"
+                    style={{ fontSize: "30pt" }}
+                  />
+                </Link>
               </Grid>
               <Grid item>
-                <FunctionsIcon color="enabled" style={{ fontSize: "30pt" }} />
+                <Link to="/community">
+                  <FunctionsIcon
+                    className={iconClassName(4)}
+                    color="enabled"
+                    style={{ fontSize: "30pt" }}
+                  />
+                </Link>
               </Grid>
               <Grid item xs>
                 <TextField
