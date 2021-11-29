@@ -154,6 +154,7 @@ export default function MenuBar() {
                   size="small"
                   color="primary"
                   style={{ width: "60%" }}
+                  label="Search"
                   InputProps={{ className: classes.input }}
                 />
               </Grid>
