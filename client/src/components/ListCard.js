@@ -1,24 +1,88 @@
 import { useContext, useState } from "react";
 import { GlobalStoreContext } from "../store";
 import TextField from "@mui/material/TextField";
+import { Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import ListItem from "@mui/material/ListItem";
 import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
+import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
+import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
+import { Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Button from "@mui/material/Button";
 
 /*
+
     This is a card in our list of top 5 lists. It lets select
     a list for editing and it has controls for changing its 
     name or deleting it.
     
     @author McKilla Gorilla
 */
+
 function ListCard(props) {
   const { store } = useContext(GlobalStoreContext);
   const [editActive, setEditActive] = useState(false);
   const [text, setText] = useState("");
   const { idNamePair } = props;
+
+  function containerTop() {
+    return (
+      <Grid container direction="row">
+        <Grid item xs={10}>
+          <Typography>List Title</Typography>
+          <Typography>Author(optional in some cases)</Typography>
+        </Grid>
+        <ThumbUpAltOutlinedIcon></ThumbUpAltOutlinedIcon>
+        <Grid item xs={1}>
+          <Typography>1000</Typography>
+        </Grid>
+        <ThumbUpAltOutlinedIcon></ThumbUpAltOutlinedIcon>
+
+        <Grid item>
+          <Typography>1000</Typography>
+        </Grid>
+      </Grid>
+    );
+  }
+  function containerBot() {
+    return (
+      <Grid container direction="row">
+        <Grid item xs={10}>
+          <Typography>EDIT/PUBLISHED</Typography>
+        </Grid>
+
+        <Grid item mr={9} xs={1}>
+          <Typography>Views: 1000</Typography>
+        </Grid>
+        <ExpandMoreIcon></ExpandMoreIcon>
+      </Grid>
+    );
+  }
+  function containerMiddle() {
+    return (
+      <Box>
+        <Typography>
+          TeADIOQWJDIQWJDQWIJJIQWJIDQW
+          DQW2IODQWDIOQWJdqwodkqwodkoqwdoqwkdoqwdqwpodkqwopdkqwopdkqwpokdqwpodkpqwodkopqwODQWWQDIJQWDIQWJIDJs
+        </Typography>
+      </Box>
+    );
+  }
+  function container() {
+    return (
+      <Grid container direction="column">
+        <Grid item mb={-2}>
+          {containerTop()}
+        </Grid>
+        <Grid item>{containerMiddle()}</Grid>
+        <Grid item mb={-7}>
+          {containerBot()}
+        </Grid>
+      </Grid>
+    );
+  }
 
   function handleLoadList(event, id) {
     if (!event.target.disabled) {
@@ -68,43 +132,40 @@ function ListCard(props) {
       return true;
     } else return false;
   }
+  function colorStatus() {
+    // Condition if the list is not published
+    if (!true) return "#d4d4f5";
+    else return "#fffff0";
+  }
+  // Colors:
+  // Blue = LIST already published - #d4d4f5
+
+  // Yellowish = List not published - #fffff0
 
   let cardElement = (
     <ListItem
       disabled={buttonController()}
       id={idNamePair._id}
       key={idNamePair._id}
-      sx={{ marginTop: "15px", display: "flex", p: 1 }}
-      button
-      onClick={(event) => {
-        handleLoadList(event, idNamePair._id);
+      sx={{
+        marginTop: "15px",
+        display: "flex",
+        p: 1,
+        // bgcolor: "background.paper",
+        bgcolor: colorStatus(),
+        border: "2px solid #000",
+        borderRadius: 3,
       }}
+      // button
+      // onClick={(event) => {
+      //   handleLoadList(event, idNamePair._id);
+      // }}
       style={{
         fontSize: "48pt",
         width: "100%",
       }}
     >
-      <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
-      <Box sx={{ p: 1 }}>
-        <IconButton
-          disabled={buttonController()}
-          onClick={handleToggleEdit}
-          aria-label="edit"
-        >
-          <EditIcon style={{ fontSize: "48pt" }} />
-        </IconButton>
-      </Box>
-      <Box sx={{ p: 1 }}>
-        <IconButton
-          disabled={buttonController()}
-          onClick={(event) => {
-            handleDeleteList(event, idNamePair._id);
-          }}
-          aria-label="delete"
-        >
-          <DeleteIcon style={{ fontSize: "48pt" }} />
-        </IconButton>
-      </Box>
+      {container()}
     </ListItem>
   );
 

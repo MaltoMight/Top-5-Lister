@@ -33,7 +33,7 @@ const HomeScreen = () => {
         sx={{
           width: "95%",
           left: "2%",
-          bgcolor: "background.paper",
+          // bgcolor: "background.paper",
         }}
       >
         {store.idNamePairs.map((pair) => (

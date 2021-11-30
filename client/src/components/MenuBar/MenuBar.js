@@ -117,56 +117,58 @@ export default function MenuBar() {
 
     if (valid) {
       menuBar = (
-        <ThemeProvider theme={theme}>
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container direction="row" alignItems="center" spacing={2}>
-              <Grid item></Grid>
-              <Grid item>{homeIcon}</Grid>
-              <Grid item>
-                <Link to="/all">
-                  <GroupsIcon
-                    className={iconClassName(2)}
-                    color="enabled"
-                    style={{ fontSize: "30pt" }}
+        <div className="top5-menuBar">
+          <ThemeProvider theme={theme}>
+            <Box sx={{ flexGrow: 1 }}>
+              <Grid container direction="row" alignItems="center" spacing={2}>
+                <Grid item></Grid>
+                <Grid item>{homeIcon}</Grid>
+                <Grid item>
+                  <Link to="/all">
+                    <GroupsIcon
+                      className={iconClassName(2)}
+                      color="enabled"
+                      style={{ fontSize: "30pt" }}
+                    />
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link to="/user">
+                    <PersonIcon
+                      className={iconClassName(3)}
+                      color="enabled"
+                      style={{ fontSize: "30pt" }}
+                    />
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link to="/community">
+                    <FunctionsIcon
+                      className={iconClassName(4)}
+                      color="enabled"
+                      style={{ fontSize: "30pt" }}
+                    />
+                  </Link>
+                </Grid>
+                <Grid item xs>
+                  <TextField
+                    size="small"
+                    color="primary"
+                    style={{ width: "60%" }}
+                    label="Search"
+                    InputProps={{ className: classes.input }}
                   />
-                </Link>
+                </Grid>
+                <Grid item>
+                  <Typography>SORT BY</Typography>
+                </Grid>
+                <Grid item>
+                  <SortIcon color="disabled" style={{ fontSize: "30pt" }} />
+                </Grid>
               </Grid>
-              <Grid item>
-                <Link to="/user">
-                  <PersonIcon
-                    className={iconClassName(3)}
-                    color="enabled"
-                    style={{ fontSize: "30pt" }}
-                  />
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link to="/community">
-                  <FunctionsIcon
-                    className={iconClassName(4)}
-                    color="enabled"
-                    style={{ fontSize: "30pt" }}
-                  />
-                </Link>
-              </Grid>
-              <Grid item xs>
-                <TextField
-                  size="small"
-                  color="primary"
-                  style={{ width: "60%" }}
-                  label="Search"
-                  InputProps={{ className: classes.input }}
-                />
-              </Grid>
-              <Grid item>
-                <Typography>SORT BY</Typography>
-              </Grid>
-              <Grid item>
-                <SortIcon color="disabled" style={{ fontSize: "30pt" }} />
-              </Grid>
-            </Grid>
-          </Box>
-        </ThemeProvider>
+            </Box>
+          </ThemeProvider>
+        </div>
       );
     }
 
