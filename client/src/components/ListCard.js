@@ -4,6 +4,8 @@ import TextField from "@mui/material/TextField";
 import { Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import ListItem from "@mui/material/ListItem";
+import List from "@mui/material/List";
+
 import IconButton from "@mui/material/IconButton";
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
@@ -35,7 +37,7 @@ function ListCard(props) {
           <Typography>Author(optional in some cases)</Typography>
         </Grid>
         <ThumbUpAltOutlinedIcon></ThumbUpAltOutlinedIcon>
-        <Grid item xs={1}>
+        <Grid item mr={2}>
           <Typography>1000</Typography>
         </Grid>
         <ThumbUpAltOutlinedIcon></ThumbUpAltOutlinedIcon>
@@ -48,7 +50,7 @@ function ListCard(props) {
   }
   function containerBot() {
     return (
-      <Grid container direction="row">
+      <Grid container direction="row" spacing={0}>
         <Grid item xs={10}>
           <Typography>EDIT/PUBLISHED</Typography>
         </Grid>
@@ -63,10 +65,82 @@ function ListCard(props) {
   function containerMiddle() {
     return (
       <Box>
-        <Typography>
-          TeADIOQWJDIQWJDQWIJJIQWJIDQW
-          DQW2IODQWDIOQWJdqwodkqwodkoqwdoqwkdoqwdqwpodkqwopdkqwopdkqwpokdqwpodkpqwodkopqwODQWWQDIJQWDIQWJIDJs
-        </Typography>
+        <Grid container style={{ border: "solid black" }}>
+          <Grid
+            item
+            width={"50%"}
+            style={{ borderRadius: "10px", border: "solid green" }}
+          >
+            <Typography>Item #1</Typography>
+            <Typography>Item #2</Typography>
+            <Typography>Item #3</Typography>
+            <Typography>Item #4</Typography>
+            <Typography>Item #5</Typography>
+            <Typography>Item #5</Typography>
+            <Typography>Item #5</Typography>
+            <Typography>Item #5</Typography>
+            <Typography>Item #5</Typography>
+            <Typography>Item #5</Typography>
+            <Typography>Item #5</Typography>
+          </Grid>
+          <Grid
+            item
+            container
+            direction="column"
+            width={"50%"}
+            style={{ borderRadius: "10px", border: "solid green" }}
+          >
+            <Grid
+              item
+              container
+              width={"100%"}
+              height={"20vh"}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: "10px",
+                border: "solid yellow",
+                overflow: "auto",
+              }}
+            >
+              <Grid item>
+                <Typography>COmment</Typography>
+                <Typography>COmment</Typography>
+                <Typography>COmment</Typography>
+              </Grid>
+            </Grid>
+            <Grid item>
+              <TextField
+                label="COMMENT YOUR FUCKING COMMENT"
+                style={{ width: "100%" }}
+              ></TextField>
+            </Grid>
+          </Grid>
+          {/* <Grid
+            item
+            width={"50%"}
+            height={"20vh"}
+            pl={1}
+            style={{
+              display: "flex",
+              overflow: "auto",
+              flexDirection: "column",
+              borderRadius: "10px",
+              border: "solid green",
+            }}
+          >
+            <Typography>Comments </Typography>
+            <Typography>Comments </Typography>
+            <Typography>Comments </Typography>
+            <Typography>Comments </Typography>
+            <Typography>Comments </Typography>
+            <Typography>Comments </Typography>
+            <Typography>Comments </Typography>
+            <Typography>Comments </Typography>
+            <Typography>Comments </Typography>
+            <Typography>Comments </Typography>
+          </Grid> */}
+        </Grid>
       </Box>
     );
   }
@@ -143,14 +217,16 @@ function ListCard(props) {
   // Yellowish = List not published - #fffff0
 
   let cardElement = (
-    <ListItem
+    <List
+      item
       disabled={buttonController()}
       id={idNamePair._id}
       key={idNamePair._id}
       sx={{
         marginTop: "15px",
-        display: "flex",
         p: 1,
+        display: "flex",
+        // flexWrap: "wrap",
         // bgcolor: "background.paper",
         bgcolor: colorStatus(),
         border: "2px solid #000",
@@ -165,8 +241,10 @@ function ListCard(props) {
         width: "100%",
       }}
     >
-      {container()}
-    </ListItem>
+      <Box width={"100%"} style={{ overflow: "hidden" }}>
+        {container()}
+      </Box>
+    </List>
   );
 
   if (editActive) {
