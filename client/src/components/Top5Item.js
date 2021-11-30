@@ -6,13 +6,58 @@ export default function Top5Item(props) {
       item
       width={"40%"}
       sx={{ bgcolor: "#2c2f70" }}
-      style={{ borderRadius: "10px", marginRight: "10px" }}
+      style={{ overflow: "auto", borderRadius: "10px", marginRight: "10px" }}
     >
-      <Typography>Item #1</Typography>
-      <Typography>Item #2</Typography>
-      <Typography>Item #3</Typography>
-      <Typography>Item #4</Typography>
-      <Typography>Item #5</Typography>
+      <Typography
+        style={{
+          fontSize: "35px",
+          paddingTop: "10px",
+          paddingLeft: "10px",
+          color: "#d5af36",
+        }}
+      >
+        1.
+      </Typography>
+      <Typography
+        style={{
+          fontSize: "35px",
+          paddingLeft: "10px",
+          paddingTop: "10px",
+          color: "#d5af36",
+        }}
+      >
+        2.
+      </Typography>{" "}
+      <Typography
+        style={{
+          fontSize: "35px",
+          paddingLeft: "10px",
+          paddingTop: "10px",
+          color: "#d5af36",
+        }}
+      >
+        3.
+      </Typography>
+      <Typography
+        style={{
+          fontSize: "35px",
+          paddingLeft: "10px",
+          paddingTop: "10px",
+          color: "#d5af36",
+        }}
+      >
+        4.
+      </Typography>
+      <Typography
+        style={{
+          fontSize: "35px",
+          paddingLeft: "10px",
+          paddingTop: "10px",
+          color: "#d5af36",
+        }}
+      >
+        5.
+      </Typography>
     </Grid>
   );
 }

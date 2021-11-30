@@ -88,20 +88,26 @@ function ListCard(props) {
               item
               container
               width={"100%"}
-              height={"20vh"}
+              height={"25vh"}
               style={{
                 display: "flex",
                 flexDirection: "column",
                 borderRadius: "10px",
                 overflow: "auto",
+                marginBottom: "20px",
               }}
             >
               <List>{commentManager()}</List>
             </Grid>
             <Grid item>
+              {" "}
               <TextField
                 label="COMMENT YOUR FUCKING COMMENT"
-                style={{ borderRadius: "10px", width: "100%" }}
+                style={{
+                  marginTop: "20px",
+
+                  width: "100%",
+                }}
               ></TextField>
             </Grid>
           </Grid>
