@@ -14,6 +14,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 
+import CommentCard from "./CommentCard";
+import Top5Item from "./Top5Item";
 /*
 
     This is a card in our list of top 5 lists. It lets select
@@ -29,11 +31,11 @@ function ListCard(props) {
   const [text, setText] = useState("");
   const { idNamePair } = props;
 
-  function containerTop() {
+  function containerTop(title) {
     return (
       <Grid container direction="row">
         <Grid item xs={10}>
-          <Typography>List Title</Typography>
+          <Typography>{title}</Typography>
           <Typography>Author(optional in some cases)</Typography>
         </Grid>
         <ThumbUpAltOutlinedIcon></ThumbUpAltOutlinedIcon>
@@ -62,33 +64,25 @@ function ListCard(props) {
       </Grid>
     );
   }
+  function commentManager() {
+    let x = 10;
+    let card = [];
+    for (let i = 0; i < x; i++) {
+      card.push(<CommentCard />);
+    }
+    return card;
+  }
   function containerMiddle() {
     return (
       <Box>
-        <Grid container style={{ border: "solid black" }}>
-          <Grid
-            item
-            width={"50%"}
-            style={{ borderRadius: "10px", border: "solid green" }}
-          >
-            <Typography>Item #1</Typography>
-            <Typography>Item #2</Typography>
-            <Typography>Item #3</Typography>
-            <Typography>Item #4</Typography>
-            <Typography>Item #5</Typography>
-            <Typography>Item #5</Typography>
-            <Typography>Item #5</Typography>
-            <Typography>Item #5</Typography>
-            <Typography>Item #5</Typography>
-            <Typography>Item #5</Typography>
-            <Typography>Item #5</Typography>
-          </Grid>
+        <Grid container>
+          <Top5Item />
           <Grid
             item
             container
             direction="column"
-            width={"50%"}
-            style={{ borderRadius: "10px", border: "solid green" }}
+            width={"55%"}
+            style={{ borderRadius: "10px" }}
           >
             <Grid
               item
@@ -99,56 +93,27 @@ function ListCard(props) {
                 display: "flex",
                 flexDirection: "column",
                 borderRadius: "10px",
-                border: "solid yellow",
                 overflow: "auto",
               }}
             >
-              <Grid item>
-                <Typography>COmment</Typography>
-                <Typography>COmment</Typography>
-                <Typography>COmment</Typography>
-              </Grid>
+              <List>{commentManager()}</List>
             </Grid>
             <Grid item>
               <TextField
                 label="COMMENT YOUR FUCKING COMMENT"
-                style={{ width: "100%" }}
+                style={{ borderRadius: "10px", width: "100%" }}
               ></TextField>
             </Grid>
           </Grid>
-          {/* <Grid
-            item
-            width={"50%"}
-            height={"20vh"}
-            pl={1}
-            style={{
-              display: "flex",
-              overflow: "auto",
-              flexDirection: "column",
-              borderRadius: "10px",
-              border: "solid green",
-            }}
-          >
-            <Typography>Comments </Typography>
-            <Typography>Comments </Typography>
-            <Typography>Comments </Typography>
-            <Typography>Comments </Typography>
-            <Typography>Comments </Typography>
-            <Typography>Comments </Typography>
-            <Typography>Comments </Typography>
-            <Typography>Comments </Typography>
-            <Typography>Comments </Typography>
-            <Typography>Comments </Typography>
-          </Grid> */}
         </Grid>
       </Box>
     );
   }
-  function container() {
+  function container(idNamePair) {
     return (
       <Grid container direction="column">
         <Grid item mb={-2}>
-          {containerTop()}
+          {containerTop(idNamePair.name)}
         </Grid>
         <Grid item>{containerMiddle()}</Grid>
         <Grid item mb={-7}>
@@ -181,9 +146,6 @@ function ListCard(props) {
   async function handleDeleteList(event, id) {
     event.stopPropagation();
     store.markListForDeletion(id);
-    // if (!store.setIsListNameEditActive) {
-    //   store.markListForDeletion(id);
-    // }
   }
 
   function handleKeyPress(event) {
@@ -242,7 +204,7 @@ function ListCard(props) {
       }}
     >
       <Box width={"100%"} style={{ overflow: "hidden" }}>
-        {container()}
+        {container(idNamePair)}
       </Box>
     </List>
   );
