@@ -44,6 +44,7 @@ export const logoutUser = () => api.get(`/logout/`); // not implemented
 export const getUserAllTop5List = (payload) =>
   api.get(`/top5listpairs/`, { params: payload });
 
+export const addComment = (payload) => api.post("/addcomment/", payload);
 const apis = {
   createTop5List,
   getAllTop5Lists,
@@ -51,6 +52,8 @@ const apis = {
   updateTop5ListById,
   deleteTop5ListById,
   getTop5ListById,
+
+  addComment,
 
   getLoggedIn,
   registerUser,

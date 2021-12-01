@@ -167,6 +167,11 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
         });
       }
+
+      // ADD COMMENT
+      case GlobalStoreActionType.ADD_COMMENT_LIST: {
+        return setStore({});
+      }
       default:
         return store;
     }
@@ -189,6 +194,7 @@ function GlobalStoreContextProvider(props) {
       published: false,
       firstName: auth.user.firstName,
       lastName: auth.user.lastName,
+      comments: [],
     };
     const response = await api.createTop5List(payload);
     if (response.data.success) {
@@ -235,6 +241,34 @@ function GlobalStoreContextProvider(props) {
     localStorage.setItem("counter", value);
   };
 
+  store.addComment = async function (listId, comments) {
+    let payload = {
+      _id: listId,
+      firstName: auth.user.firstName,
+      lastName: auth.user.lastName,
+      message: comments,
+    };
+    console.log("payload:", payload);
+    let response = await api.addComment(payload);
+    // let comment = {
+    //   firstName: response.data.firstName,
+    //   lastName: response.data.lastName,
+    //   message: response.data.message,
+    // };
+    payload = {
+      ownerEmail: auth.user.email,
+    };
+    response = await api.getUserAllTop5List(payload);
+    if (response.data.success) {
+      let pairsArray = response.data.idNamePairs;
+      storeReducer({
+        type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+        payload: pairsArray,
+      });
+    } else {
+      console.log("API FAILED TO GET THE LIST PAIRS");
+    }
+  };
   // *****************************************************************************/
 
   return (

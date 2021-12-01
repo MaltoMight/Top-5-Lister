@@ -1,39 +1,6 @@
 const Top5List = require("../models/top5list-model");
 const mongoose = require("mongoose");
 
-createTop5List = (req, res) => {
-  const body = req.body;
-  console.log("body:", body);
-  if (!body) {
-    return res.status(400).json({
-      success: false,
-      error: "You must provide a Top 5 List",
-    });
-  }
-
-  const top5List = new Top5List(body);
-  console.log("creating top5List: " + JSON.stringify(top5List));
-  if (!top5List) {
-    return res.status(400).json({ success: false, error: err });
-  }
-
-  top5List
-    .save()
-    .then(() => {
-      return res.status(201).json({
-        success: true,
-        top5List: top5List,
-        message: "Top 5 List Created!",
-      });
-    })
-    .catch((error) => {
-      return res.status(400).json({
-        error,
-        message: "Top 5 List Not Created!",
-      });
-    });
-};
-
 updateTop5List = async (req, res) => {
   const body = req.body;
   console.log("updateTop5List: " + JSON.stringify(body));
@@ -127,6 +94,40 @@ getTop5Lists = async (req, res) => {
     return res.status(200).json({ success: true, data: top5Lists });
   }).catch((err) => console.log(err));
 };
+// *****************************************************************************************************//
+
+createTop5List = (req, res) => {
+  const body = req.body;
+  console.log("body:", body);
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a Top 5 List",
+    });
+  }
+
+  const top5List = new Top5List(body);
+  console.log("creating top5List: " + JSON.stringify(top5List));
+  if (!top5List) {
+    return res.status(400).json({ success: false, error: err });
+  }
+
+  top5List
+    .save()
+    .then(() => {
+      return res.status(201).json({
+        success: true,
+        top5List: top5List,
+        message: "Top 5 List Created!",
+      });
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error,
+        message: "Top 5 List Not Created!",
+      });
+    });
+};
 
 getUserAllTop5List = async (req, res) => {
   let { ownerEmail } = req.query;
@@ -159,6 +160,8 @@ getUserAllTop5List = async (req, res) => {
           ownerEmail: list.ownerEmail,
           firstName: list.firstName,
           lastName: list.lastName,
+          comments: list.comments,
+          published: list.published,
         };
         pairs.push(pair);
       }
@@ -167,6 +170,44 @@ getUserAllTop5List = async (req, res) => {
   }).catch((err) => console.log(err));
 };
 
+addComment = async (req, res) => {
+  console.log("adding comment");
+  // console.log("req:", req);
+  let { message, firstName, lastName } = req.body;
+  console.log(message, firstName, lastName);
+  Top5List.findOne({ _id: req.body._id }, (err, top5List) => {
+    console.log(top5List);
+    top5List.comments.addToSet({
+      firstname: firstName,
+      lastName: lastName,
+      message: message,
+    });
+    console.log(top5List);
+    // top5List.save();
+    top5List
+      .save()
+      .then(() => {
+        console.log("SUCCESS!!!");
+        return res.status(200).json({
+          success: true,
+          comment: {
+            firstName: firstName,
+            lastName: lastName,
+            message: message,
+          },
+          id: top5List._id,
+          message: "Top 5 List updated!",
+        });
+      })
+      .catch((error) => {
+        console.log("FAILURE: " + JSON.stringify(error));
+        return res.status(404).json({
+          error,
+          message: "Top 5 List not updated!",
+        });
+      });
+  });
+};
 module.exports = {
   createTop5List,
   updateTop5List,
@@ -174,4 +215,5 @@ module.exports = {
   getTop5Lists,
   getUserAllTop5List,
   getTop5ListById,
+  addComment,
 };

@@ -14,6 +14,11 @@ const Top5ListSchema = new Schema(
     published: { type: Boolean, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
+    comments: [Schema.Types.Mixed],
+    // comments: {
+    //   type: [{ firstName: String }, { lastName: String }, { comment: String }],
+    //   required: true,
+    // },
   },
   { timestamps: true }
 );

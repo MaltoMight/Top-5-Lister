@@ -17,6 +17,7 @@ router.get("/logout", UserController.logoutUser);
 // **************************************************
 router.post("/top5list", auth.verify, Top5ListController.createTop5List);
 
+router.post("/addcomment", Top5ListController.addComment); // add comment
 router.get(
   "/top5listpairs",
   auth.verify,

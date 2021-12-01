@@ -29,6 +29,9 @@ function ListCard(props) {
   const [editActive, setEditActive] = useState(true);
   const [text, setText] = useState("");
   const { idNamePair } = props;
+  function handleComment(idList, comment) {
+    store.addComment(idList, comment);
+  }
 
   function containerTop(idNamePair) {
     return (
@@ -65,14 +68,7 @@ function ListCard(props) {
       </Grid>
     );
   }
-  function commentManager() {
-    let x = 10;
-    let card = [];
-    for (let i = 0; i < x; i++) {
-      card.push(<CommentCard />);
-    }
-    return card;
-  }
+
   function containerMiddle() {
     // If list is active
     if (editActive) {
@@ -100,12 +96,26 @@ function ListCard(props) {
                   marginBottom: "20px",
                 }}
               >
-                <List>{commentManager()}</List>
+                <List>
+                  {idNamePair.comments.map((pair) => (
+                    <CommentCard
+                      key={pair._id}
+                      idNamePair={pair}
+                      selected={false}
+                    />
+                  ))}
+                </List>
               </Grid>
               <Grid item>
                 {" "}
                 <TextField
-                  label="COMMENT YOUR FUCKING COMMENT"
+                  label="Add Comment"
+                  onKeyPress={(event) => {
+                    if (event.key === "Enter" && event.target.value !== "") {
+                      handleComment(idNamePair._id, event.target.value);
+                      event.target.value = "";
+                    }
+                  }}
                   style={{
                     marginTop: "20px",
 
@@ -138,7 +148,7 @@ function ListCard(props) {
 
   function colorStatus() {
     // Condition if the list is not published
-    if (!true) return "#d4d4f5";
+    if (idNamePair.published) return "#d4d4f5";
     else return "#fffff0";
   }
   // Colors:

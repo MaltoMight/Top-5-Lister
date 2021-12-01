@@ -1,4 +1,7 @@
 import { Typography, List } from "@mui/material";
+import { GlobalStoreContext } from "../store";
+import { useContext, useState } from "react";
+
 export default function CommentCard(props) {
   return (
     <List
@@ -12,9 +15,9 @@ export default function CommentCard(props) {
       }}
     >
       <Typography style={{ color: "blue", fontSize: "15px" }}>
-        Author
+        {props.idNamePair.firstname} {props.idNamePair.lastName}
       </Typography>
-      <Typography>Comments</Typography>
+      <Typography>{props.idNamePair.message}</Typography>
     </List>
   );
 }
