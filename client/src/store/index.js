@@ -176,68 +176,19 @@ function GlobalStoreContextProvider(props) {
   // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN
   // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
-  // THIS FUNCTION PROCESSES CHANGING A LIST NAME
-  store.changeListName = async function (id, newName) {
-    let payload = {
-      ownerEmail: auth.user.email,
-    };
-    let response = await api.getTop5ListById(id, payload);
-    if (response.data.success) {
-      let top5List = response.data.top5List;
-      top5List.name = newName;
-      async function updateList(top5List) {
-        response = await api.updateTop5ListById(top5List._id, top5List);
-        if (response.data.success) {
-          async function getListPairs(top5List) {
-            response = await api.getTop5ListPairs(payload);
-            if (response.data.success) {
-              let pairsArray = response.data.idNamePairs;
-              storeReducer({
-                type: GlobalStoreActionType.CHANGE_LIST_NAME,
-                payload: {
-                  idNamePairs: pairsArray,
-                  top5List: top5List,
-                },
-              });
-            }
-          }
-          getListPairs(top5List);
-        }
-      }
-      updateList(top5List);
-    }
-  };
-
-  // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
-  store.closeCurrentList = function () {
-    storeReducer({
-      type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
-      payload: {},
-    });
-
-    tps.clearAllTransactions();
-    history.push("/");
-  };
-
-  store.storeListCounter = function (value) {
-    localStorage.setItem("counter", value);
-  };
-  store.getListCounter = function () {
-    let counter = localStorage.getItem("counter");
-    if (!counter) {
-      counter = 0;
-    }
-    // Returns value to avoid multiple payload which can overrites the previous one
-    return counter;
-  };
   // THIS FUNCTION CREATES A NEW LIST
   store.createNewList = async function () {
     let newKey = store.getListCounter();
     let newListName = "Untitled" + newKey;
+    console.log("auth:", auth);
     let payload = {
       name: newListName,
       items: ["?", "?", "?", "?", "?"],
       ownerEmail: auth.user.email,
+      stats: { like: 0, dislike: 0, views: 0 },
+      published: false,
+      firstName: auth.user.firstName,
+      lastName: auth.user.lastName,
     };
     const response = await api.createTop5List(payload);
     if (response.data.success) {
@@ -255,13 +206,12 @@ function GlobalStoreContextProvider(props) {
       console.log("API FAILED TO CREATE A NEW LIST");
     }
   };
-
   // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
   store.loadIdNamePairs = async function () {
     let payload = {
       ownerEmail: auth.user.email,
     };
-    const response = await api.getTop5ListPairs(payload);
+    const response = await api.getUserAllTop5List(payload);
     if (response.data.success) {
       let pairsArray = response.data.idNamePairs;
       storeReducer({
@@ -273,206 +223,19 @@ function GlobalStoreContextProvider(props) {
     }
   };
 
-  // THE FOLLOWING 5 FUNCTIONS ARE FOR COORDINATING THE DELETION
-  // OF A LIST, WHICH INCLUDES USING A VERIFICATION MODAL. THE
-  // FUNCTIONS ARE markListForDeletion, deleteList, deleteMarkedList,
-  // showDeleteListModal, and hideDeleteListModal
-  store.markListForDeletion = async function (id) {
-    // GET THE LIST
-    let payload = {
-      ownerEmail: auth.user.email,
-    };
-    let response = await api.getTop5ListById(id, payload);
-    if (response.data.success) {
-      let top5List = response.data.top5List;
-      storeReducer({
-        type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
-        payload: top5List,
-      });
+  store.getListCounter = function () {
+    let counter = localStorage.getItem("counter");
+    if (!counter) {
+      counter = 0;
     }
+    // Returns value to avoid multiple payload which can overrites the previous one
+    return counter;
+  };
+  store.storeListCounter = function (value) {
+    localStorage.setItem("counter", value);
   };
 
-  store.deleteList = async function (listToDelete) {
-    let response = await api.deleteTop5ListById(listToDelete._id);
-    if (response.data.success) {
-      store.loadIdNamePairs();
-      history.push("/");
-    }
-  };
-
-  store.deleteMarkedList = function () {
-    store.deleteList(store.listMarkedForDeletion);
-  };
-
-  store.unmarkListForDeletion = function () {
-    storeReducer({
-      type: GlobalStoreActionType.UNMARK_LIST_FOR_DELETION,
-      payload: null,
-    });
-  };
-
-  // THE FOLLOWING 8 FUNCTIONS ARE FOR COORDINATING THE UPDATING
-  // OF A LIST, WHICH INCLUDES DEALING WITH THE TRANSACTION STACK. THE
-  // FUNCTIONS ARE setCurrentList, addMoveItemTransaction, addUpdateItemTransaction,
-  // moveItem, updateItem, updateCurrentList, undo, and redo
-  store.restoreList = async function (id, email) {
-    // Check if the ID is valid
-    try {
-      let payload = { ownerEmail: email };
-      await api.getTop5ListById(id, payload);
-    } catch (err) {
-      // Not valid ID
-      if (!err.response) {
-        return { success: false, message: "Invalid List" };
-      } else {
-        return { success: false, message: err.response.data.error };
-      }
-    }
-
-    // Check if the EMAIL is valid
-    let response = await store.setCurrentList(id, email);
-    if (!response) {
-      return { success: true, message: "" };
-    } else {
-      return { success: false, message: response };
-    }
-  };
-  store.setCurrentList = async function (id, ownerEmail = null) {
-    try {
-      let payload = {};
-      if (!ownerEmail) {
-        payload = { ownerEmail: auth.user.email };
-      } else {
-        payload = { ownerEmail };
-      }
-      let response = await api.getTop5ListById(id, payload);
-      if (response.data.success) {
-        let top5List = response.data.top5List;
-
-        response = await api.updateTop5ListById(top5List._id, top5List);
-        if (response.data.success) {
-          storeReducer({
-            type: GlobalStoreActionType.SET_CURRENT_LIST,
-            payload: top5List,
-          });
-          history.push("/top5list/" + top5List._id);
-        }
-      } else {
-        return response.data.error;
-      }
-    } catch (err) {
-      return err.response.data.error;
-    }
-  };
-
-  store.addMoveItemTransaction = function (start, end) {
-    let transaction = new MoveItem_Transaction(store, start, end);
-    tps.addTransaction(transaction);
-  };
-  store.closeCurrentEditItem = function () {
-    if (store.isItemEditActive) {
-      storeReducer({
-        type: GlobalStoreActionType.CLOSE_ITEM_EDIT_ACTIVE,
-      });
-    }
-  };
-
-  store.addUpdateItemTransaction = function (index, newText) {
-    let oldText = store.currentList.items[index];
-    let transaction = new UpdateItem_Transaction(
-      store,
-      index,
-      oldText,
-      newText
-    );
-    tps.addTransaction(transaction);
-  };
-
-  store.moveItem = function (start, end) {
-    start -= 1;
-    end -= 1;
-    if (start < end) {
-      let temp = store.currentList.items[start];
-      for (let i = start; i < end; i++) {
-        store.currentList.items[i] = store.currentList.items[i + 1];
-      }
-      store.currentList.items[end] = temp;
-    } else if (start > end) {
-      let temp = store.currentList.items[start];
-      for (let i = start; i > end; i--) {
-        store.currentList.items[i] = store.currentList.items[i - 1];
-      }
-      store.currentList.items[end] = temp;
-    }
-
-    // NOW MAKE IT OFFICIAL
-    store.updateCurrentList();
-  };
-
-  store.updateItem = function (index, newItem) {
-    store.currentList.items[index] = newItem;
-    store.updateCurrentList();
-  };
-
-  store.updateCurrentList = async function () {
-    const response = await api.updateTop5ListById(
-      store.currentList._id,
-      store.currentList
-    );
-    if (response.data.success) {
-      storeReducer({
-        type: GlobalStoreActionType.SET_CURRENT_LIST,
-        payload: store.currentList,
-      });
-    }
-  };
-
-  store.undo = function () {
-    tps.undoTransaction();
-  };
-
-  store.redo = function () {
-    tps.doTransaction();
-  };
-
-  store.undoSize = function () {
-    return tps.getUndoSize();
-  };
-
-  store.redoSize = function () {
-    return tps.getRedoSize();
-  };
-  store.canUndo = function () {
-    return tps.hasTransactionToUndo();
-  };
-
-  store.canRedo = function () {
-    return tps.hasTransactionToRedo();
-  };
-
-  // THIS FUNCTION ENABLES THE PROCESS OF EDITING A LIST NAME
-  store.setIsListNameEditActive = function () {
-    storeReducer({
-      type: GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE,
-      payload: null,
-    });
-  };
-
-  // THIS FUNCTION ENABLES THE PROCESS OF EDITING AN ITEM
-  store.setIsItemEditActive = function () {
-    storeReducer({
-      type: GlobalStoreActionType.SET_ITEM_EDIT_ACTIVE,
-      payload: null,
-    });
-  };
-  // HIDES THE DELETE MODAL
-  store.hideDeleteListModal = function () {
-    storeReducer({
-      type: GlobalStoreActionType.HIDE_DELETE_LIST,
-      payload: null,
-    });
-    store.closeCurrentList();
-  };
+  // *****************************************************************************/
 
   return (
     <GlobalStoreContext.Provider

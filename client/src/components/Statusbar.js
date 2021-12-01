@@ -30,15 +30,13 @@ export default function StatusBar() {
   } else if (location.pathname === "/" && auth.loggedIn) {
     isVisible = true;
   }
+
   function statusBarManager() {
     if (isVisible) {
       return (
         <div id="top5-statusbar">
           <Button onClick={handleCreateNewList}>
-            <AddIcon
-              style={{ fontSize: "50px" }}
-              sx={{ color: "black" }}
-            ></AddIcon>
+            <AddIcon style={{ fontSize: "50px" }} sx={{ color: "black" }} />
           </Button>
           <Typography variant="h4">Your Lists</Typography>
         </div>

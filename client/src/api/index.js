@@ -27,8 +27,7 @@ const api = axios.create({
 // CUSTOM FILTERS FOR QUERIES
 export const createTop5List = (payload) => api.post(`/top5list/`, payload);
 export const getAllTop5Lists = () => api.get(`/top5lists/`);
-export const getTop5ListPairs = (payload) =>
-  api.get(`/top5listpairs/`, { params: payload });
+
 export const updateTop5ListById = (id, payload) =>
   api.put(`/top5list/${id}`, payload);
 export const deleteTop5ListById = (id) => api.delete(`/top5list/${id}`);
@@ -41,10 +40,14 @@ export const registerUser = (payload) => api.post(`/register/`, payload);
 export const loginUser = (payload) => api.post(`/login/`, payload); // not implemented
 export const logoutUser = () => api.get(`/logout/`); // not implemented
 
+// ******************************************************************/
+export const getUserAllTop5List = (payload) =>
+  api.get(`/top5listpairs/`, { params: payload });
+
 const apis = {
   createTop5List,
   getAllTop5Lists,
-  getTop5ListPairs,
+  getUserAllTop5List,
   updateTop5ListById,
   deleteTop5ListById,
   getTop5ListById,

@@ -12,7 +12,7 @@ export default function Top5Item(props) {
         style={{
           fontSize: "35px",
           paddingTop: "10px",
-          paddingLeft: "10px",
+          paddingLeft: "12px",
           color: "#d5af36",
         }}
       >
@@ -22,7 +22,7 @@ export default function Top5Item(props) {
         style={{
           fontSize: "35px",
           paddingLeft: "10px",
-          paddingTop: "10px",
+          paddingTop: "12px",
           color: "#d5af36",
         }}
       >
@@ -31,7 +31,7 @@ export default function Top5Item(props) {
       <Typography
         style={{
           fontSize: "35px",
-          paddingLeft: "10px",
+          paddingLeft: "12px",
           paddingTop: "10px",
           color: "#d5af36",
         }}
@@ -41,7 +41,7 @@ export default function Top5Item(props) {
       <Typography
         style={{
           fontSize: "35px",
-          paddingLeft: "10px",
+          paddingLeft: "12px",
           paddingTop: "10px",
           color: "#d5af36",
         }}
@@ -51,7 +51,7 @@ export default function Top5Item(props) {
       <Typography
         style={{
           fontSize: "35px",
-          paddingLeft: "10px",
+          paddingLeft: "12px",
           paddingTop: "10px",
           color: "#d5af36",
         }}

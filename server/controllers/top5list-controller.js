@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 createTop5List = (req, res) => {
   const body = req.body;
-
+  console.log("body:", body);
   if (!body) {
     return res.status(400).json({
       success: false,
@@ -127,7 +127,8 @@ getTop5Lists = async (req, res) => {
     return res.status(200).json({ success: true, data: top5Lists });
   }).catch((err) => console.log(err));
 };
-getTop5ListPairs = async (req, res) => {
+
+getUserAllTop5List = async (req, res) => {
   let { ownerEmail } = req.query;
   console.log(ownerEmail);
   await Top5List.find({ ownerEmail: ownerEmail }, (err, top5Lists) => {
@@ -145,9 +146,19 @@ getTop5ListPairs = async (req, res) => {
       let pairs = [];
       for (let key in top5Lists) {
         let list = top5Lists[key];
+        console.log("list:", list);
         let pair = {
           _id: list._id,
           name: list.name,
+          stats: {
+            like: list.stats.like,
+            dislike: list.stats.dislike,
+            views: list.stats.views,
+          },
+          items: list.items,
+          ownerEmail: list.ownerEmail,
+          firstName: list.firstName,
+          lastName: list.lastName,
         };
         pairs.push(pair);
       }
@@ -161,6 +172,6 @@ module.exports = {
   updateTop5List,
   deleteTop5List,
   getTop5Lists,
-  getTop5ListPairs,
+  getUserAllTop5List,
   getTop5ListById,
 };
