@@ -190,7 +190,7 @@ function GlobalStoreContextProvider(props) {
       name: newListName,
       items: ["?", "?", "?", "?", "?"],
       ownerEmail: auth.user.email,
-      stats: { like: 0, dislike: 0, views: 0 },
+      stats: { like: [], dislike: [], views: 0 },
       published: false,
       firstName: auth.user.firstName,
       lastName: auth.user.lastName,
@@ -212,6 +212,7 @@ function GlobalStoreContextProvider(props) {
       console.log("API FAILED TO CREATE A NEW LIST");
     }
   };
+
   // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
   store.loadIdNamePairs = async function () {
     let payload = {
@@ -267,6 +268,29 @@ function GlobalStoreContextProvider(props) {
       });
     } else {
       console.log("API FAILED TO GET THE LIST PAIRS");
+    }
+  };
+  store.upVote = async function (listId) {
+    let email = auth.user.email;
+    let payload = {
+      userEmail: email,
+      listId: listId,
+    };
+    let response = await api.upVote(payload);
+    if (response.data.success) {
+      store.loadIdNamePairs();
+    }
+  };
+
+  store.downVote = async function (listId) {
+    let email = auth.user.email;
+    let payload = {
+      userEmail: email,
+      listId: listId,
+    };
+    let response = await api.downVote(payload);
+    if (response.data.success) {
+      store.loadIdNamePairs();
     }
   };
   // *****************************************************************************/

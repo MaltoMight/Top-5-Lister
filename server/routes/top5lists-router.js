@@ -15,6 +15,7 @@ router.post("/login", UserController.loginUser);
 router.get("/logout", UserController.logoutUser);
 
 // **************************************************
+
 router.post("/top5list", auth.verify, Top5ListController.createTop5List);
 
 router.post("/addcomment", Top5ListController.addComment); // add comment
@@ -23,5 +24,8 @@ router.get(
   auth.verify,
   Top5ListController.getUserAllTop5List
 );
+
+router.post("/upvote", Top5ListController.upVoteList);
+router.post("/downvote", Top5ListController.downVoteList);
 
 module.exports = router;

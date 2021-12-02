@@ -94,7 +94,7 @@ getTop5Lists = async (req, res) => {
     return res.status(200).json({ success: true, data: top5Lists });
   }).catch((err) => console.log(err));
 };
-// *****************************************************************************************************//
+// ******************************************** Workable *********************************************************//
 
 createTop5List = (req, res) => {
   const body = req.body;
@@ -148,12 +148,13 @@ getUserAllTop5List = async (req, res) => {
       for (let key in top5Lists) {
         let list = top5Lists[key];
         console.log("list:", list);
+
         let pair = {
           _id: list._id,
           name: list.name,
           stats: {
-            like: list.stats.like,
-            dislike: list.stats.dislike,
+            like: list.stats.like.length,
+            dislike: list.stats.dislike.length,
             views: list.stats.views,
           },
           items: list.items,
@@ -208,6 +209,92 @@ addComment = async (req, res) => {
       });
   });
 };
+
+upVoteList = async (req, res) => {
+  let { userEmail, listId } = req.body;
+  console.log(userEmail, listId);
+
+  userEmail = userEmail.toLowerCase();
+  // Check if the user already voted
+  let userVoted = false;
+  const query = Top5List.where({ "stats.like": userEmail });
+  // console.log(query);
+  Top5List.find(query).then((list) => {
+    console.log("list:", list.length);
+    if (list.length === 0) {
+      // Update the counter upvote
+      updateUpVote(listId, userEmail);
+    } else {
+      response = list.filter((result) => {
+        // console.log("ra", result._id.toString() === listId);
+        return result._id.toString() === listId;
+      });
+      if (response.length !== 0) {
+        return res
+          .status(400)
+          .json({ success: false, error: "Already VOTED!" });
+      } else {
+        updateUpVote(listId, userEmail);
+      }
+    }
+  });
+
+  async function updateUpVote(listId, email) {
+    console.log("listid:", listId);
+    console.log("email:", email);
+    Top5List.findOne({ _id: listId }, (err, top5List) => {
+      top5List.stats.like.push(email);
+      top5List
+        .save()
+        .then(() => {
+          return res.status(200).json({ success: true, message: "UpVoted" });
+        })
+        .catch((error) => console.log("error to update"));
+    });
+  }
+};
+downVoteList = async (req, res) => {
+  let { userEmail, listId } = req.body;
+  console.log(userEmail, listId);
+
+  userEmail = userEmail.toLowerCase();
+  // Check if the user already voted
+  let userVoted = false;
+  const query = Top5List.where({ "stats.dislike": userEmail });
+  // console.log(query);
+  Top5List.find(query).then((list) => {
+    console.log("list:", list.length);
+    if (list.length === 0) {
+      // Update the counter upvote
+      updateDownVote(listId, userEmail);
+    } else {
+      response = list.filter((result) => {
+        // console.log("ra", result._id.toString() === listId);
+        return result._id.toString() === listId;
+      });
+      if (response.length !== 0) {
+        return res
+          .status(400)
+          .json({ success: false, error: "Already VOTED!" });
+      } else {
+        updateDownVote(listId, userEmail);
+      }
+    }
+  });
+  async function updateDownVote(listId, email) {
+    console.log("listid:", listId);
+    console.log("email:", email);
+    Top5List.findOne({ _id: listId }, (err, top5List) => {
+      top5List.stats.dislike.push(email);
+      top5List
+        .save()
+        .then(() => {
+          return res.status(200).json({ success: true, message: "DownVoted" });
+        })
+        .catch((error) => console.log("error to update"));
+    });
+  }
+};
 module.exports = {
   createTop5List,
   updateTop5List,
@@ -216,4 +303,7 @@ module.exports = {
   getUserAllTop5List,
   getTop5ListById,
   addComment,
+
+  upVoteList,
+  downVoteList,
 };

@@ -45,6 +45,10 @@ export const getUserAllTop5List = (payload) =>
   api.get(`/top5listpairs/`, { params: payload });
 
 export const addComment = (payload) => api.post("/addcomment/", payload);
+
+export const upVote = (payload) => api.post("/upvote/", payload);
+export const downVote = (payload) => api.post("/downvote/", payload);
+
 const apis = {
   createTop5List,
   getAllTop5Lists,
@@ -59,6 +63,9 @@ const apis = {
   registerUser,
   loginUser,
   logoutUser,
+
+  upVote,
+  downVote,
 };
 
 export default apis;

@@ -7,8 +7,8 @@ const Top5ListSchema = new Schema(
     items: { type: [String], required: true },
     ownerEmail: { type: String, required: true },
     stats: {
-      like: { type: Number, required: true },
-      dislike: { type: Number, required: true },
+      like: { type: [String], required: true },
+      dislike: { type: [String], required: true },
       views: { type: Number, required: true },
     },
     published: { type: Boolean, required: true },

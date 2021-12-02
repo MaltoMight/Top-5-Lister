@@ -32,6 +32,12 @@ function ListCard(props) {
   function handleComment(idList, comment) {
     store.addComment(idList, comment);
   }
+  function handleUpVote() {
+    store.upVote(idNamePair._id);
+  }
+  function handleDownVote() {
+    store.downVote(idNamePair._id);
+  }
 
   function containerTop(idNamePair) {
     return (
@@ -42,11 +48,17 @@ function ListCard(props) {
             By: {idNamePair.firstName} {idNamePair.lastName}
           </Typography>
         </Grid>
-        <ThumbUpAltOutlinedIcon></ThumbUpAltOutlinedIcon>
+
+        <ThumbUpAltOutlinedIcon
+          onClick={() => handleUpVote()}
+        ></ThumbUpAltOutlinedIcon>
+
         <Grid item mr={2}>
           <Typography>{idNamePair.stats.like}</Typography>
         </Grid>
-        <ThumbUpAltOutlinedIcon></ThumbUpAltOutlinedIcon>
+        <ThumbDownOutlinedIcon
+          onClick={() => handleDownVote()}
+        ></ThumbDownOutlinedIcon>
 
         <Grid item>
           <Typography>{idNamePair.stats.dislike}</Typography>
@@ -56,15 +68,22 @@ function ListCard(props) {
   }
   function containerBot(idNamePair) {
     return (
-      <Grid container direction="row" spacing={0}>
-        <Grid item xs={10}>
+      <Grid container direction="row" spacing={0} columns={20}>
+        <Grid item xs={15}>
           <Typography>EDIT/PUBLISHED</Typography>
         </Grid>
 
-        <Grid item mr={9} xs={1}>
-          <Typography>Views: {idNamePair.stats.views}</Typography>
+        <Grid item ml={6}>
+          <Typography>Views: </Typography>
         </Grid>
-        <ExpandMoreIcon></ExpandMoreIcon>
+        <Grid item ml={3} xs={2}>
+          <Typography sx={{ color: "red" }}>
+            {idNamePair.stats.views}
+          </Typography>
+        </Grid>
+        <Grid>
+          <ExpandMoreIcon></ExpandMoreIcon>
+        </Grid>
       </Grid>
     );
   }
@@ -139,7 +158,7 @@ function ListCard(props) {
           {containerTop(idNamePair)}
         </Grid>
         <Grid item>{containerMiddle()}</Grid>
-        <Grid item mb={-7}>
+        <Grid item mb={-5}>
           {containerBot(idNamePair)}
         </Grid>
       </Grid>
