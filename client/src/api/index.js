@@ -46,8 +46,14 @@ export const getUserAllTop5List = (payload) =>
 
 export const addComment = (payload) => api.post("/addcomment/", payload);
 
-export const upVote = (payload) => api.post("/upvote/", payload);
-export const downVote = (payload) => api.post("/downvote/", payload);
+// ******************************************************************/
+
+export const removeLikeVote = (payload) => api.post("/removeLike/", payload);
+export const removeDislikeVote = (payload) =>
+  api.post("/removeDislike/", payload);
+
+export const addLikeVote = (payload) => api.post("/addLike/", payload);
+export const addDislikeVote = (payload) => api.post("/addDislike/", payload);
 
 const apis = {
   createTop5List,
@@ -64,8 +70,11 @@ const apis = {
   loginUser,
   logoutUser,
 
-  upVote,
-  downVote,
+  removeLikeVote,
+  removeDislikeVote,
+
+  addLikeVote,
+  addDislikeVote,
 };
 
 export default apis;

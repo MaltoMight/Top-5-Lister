@@ -1,6 +1,9 @@
 const Top5List = require("../models/top5list-model");
 const mongoose = require("mongoose");
 
+const LIKE = 0;
+const DISLIKE = 1;
+
 updateTop5List = async (req, res) => {
   const body = req.body;
   console.log("updateTop5List: " + JSON.stringify(body));
@@ -210,91 +213,112 @@ addComment = async (req, res) => {
   });
 };
 
-upVoteList = async (req, res) => {
+removeLikeVote = async (req, res) => {
   let { userEmail, listId } = req.body;
-  console.log(userEmail, listId);
+  Top5List.findOne({ _id: listId }, (err, top5List) => {
+    let elementIndexLike = top5List.stats.like.indexOf(userEmail);
+    let elementIndexDislike = top5List.stats.dislike.indexOf(userEmail);
+    console.log("REMOVE LIKE:");
+    console.log("ElementIndexLike:", elementIndexLike);
+    console.log("ElementIndexDislike:", elementIndexDislike);
 
-  userEmail = userEmail.toLowerCase();
-  // Check if the user already voted
-  let userVoted = false;
-  const query = Top5List.where({ "stats.like": userEmail });
-  // console.log(query);
-  Top5List.find(query).then((list) => {
-    console.log("list:", list.length);
-    if (list.length === 0) {
-      // Update the counter upvote
-      updateUpVote(listId, userEmail);
-    } else {
-      response = list.filter((result) => {
-        // console.log("ra", result._id.toString() === listId);
-        return result._id.toString() === listId;
-      });
-      if (response.length !== 0) {
-        return res
-          .status(400)
-          .json({ success: false, error: "Already VOTED!" });
-      } else {
-        updateUpVote(listId, userEmail);
-      }
-    }
-  });
-
-  async function updateUpVote(listId, email) {
-    console.log("listid:", listId);
-    console.log("email:", email);
-    Top5List.findOne({ _id: listId }, (err, top5List) => {
-      top5List.stats.like.push(email);
+    if (
+      (elementIndexDislike == -1 && elementIndexLike == -1) ||
+      (elementIndexDislike == -1 && elementIndexLike != -1)
+    ) {
+      top5List.stats.like.splice(elementIndexLike, 1);
       top5List
         .save()
         .then(() => {
-          return res.status(200).json({ success: true, message: "UpVoted" });
+          return res
+            .status(200)
+            .json({ success: true, error: "Removed Like Success" });
         })
-        .catch((error) => console.log("error to update"));
-    });
-  }
-};
-downVoteList = async (req, res) => {
-  let { userEmail, listId } = req.body;
-  console.log(userEmail, listId);
-
-  userEmail = userEmail.toLowerCase();
-  // Check if the user already voted
-  let userVoted = false;
-  const query = Top5List.where({ "stats.dislike": userEmail });
-  // console.log(query);
-  Top5List.find(query).then((list) => {
-    console.log("list:", list.length);
-    if (list.length === 0) {
-      // Update the counter upvote
-      updateDownVote(listId, userEmail);
+        .catch(() => {
+          return res
+            .status(400)
+            .json({ success: false, error: "Error to Remove like" });
+        });
     } else {
-      response = list.filter((result) => {
-        // console.log("ra", result._id.toString() === listId);
-        return result._id.toString() === listId;
-      });
-      if (response.length !== 0) {
-        return res
-          .status(400)
-          .json({ success: false, error: "Already VOTED!" });
-      } else {
-        updateDownVote(listId, userEmail);
-      }
+      return res
+        .status(400)
+        .json({ success: false, error: "User didnot vote for like" });
     }
   });
-  async function updateDownVote(listId, email) {
-    console.log("listid:", listId);
-    console.log("email:", email);
-    Top5List.findOne({ _id: listId }, (err, top5List) => {
-      top5List.stats.dislike.push(email);
+};
+addLikeVote = async (req, res) => {
+  let { userEmail, listId } = req.body;
+  Top5List.findOne({ _id: listId }, (err, top5List) => {
+    let voteList = top5List.stats.like;
+    voteList.push(userEmail);
+
+    top5List
+      .save()
+      .then(() => {
+        return res
+          .status(200)
+          .json({ success: true, error: "Added Like Success" });
+      })
+      .catch(() => {
+        return res
+          .status(400)
+          .json({ success: false, error: "Error to add like" });
+      });
+  });
+};
+addDislikeVote = async (req, res) => {
+  let { userEmail, listId } = req.body;
+  Top5List.findOne({ _id: listId }, (err, top5List) => {
+    let voteList = top5List.stats.dislike;
+    voteList.push(userEmail);
+
+    top5List
+      .save()
+      .then(() => {
+        return res
+          .status(200)
+          .json({ success: true, error: "Added Dislike Success" });
+      })
+      .catch(() => {
+        return res
+          .status(400)
+          .json({ success: false, error: "Error to add dislike" });
+      });
+  });
+};
+removeDislikeVote = async (req, res) => {
+  let { userEmail, listId } = req.body;
+  Top5List.findOne({ _id: listId }, (err, top5List) => {
+    let elementIndexDislike = top5List.stats.dislike.indexOf(userEmail);
+    let elementIndexLike = top5List.stats.like.indexOf(userEmail);
+    console.log("REMOVE DISLIKE:");
+    console.log("ElementIndexLike:", elementIndexLike);
+    console.log("ElementIndexDislike:", elementIndexDislike);
+    if (
+      (elementIndexDislike == -1 && elementIndexLike == -1) ||
+      (elementIndexLike === -1 && elementIndexDislike !== -1)
+    ) {
+      top5List.stats.dislike.splice(elementIndexDislike, 1);
       top5List
         .save()
         .then(() => {
-          return res.status(200).json({ success: true, message: "DownVoted" });
+          return res
+            .status(200)
+            .json({ success: true, error: "Removed Dislike Success" });
         })
-        .catch((error) => console.log("error to update"));
-    });
-  }
+        .catch(() => {
+          return res
+            .status(400)
+            .json({ success: false, error: "Error to Remove dislike" });
+        });
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, error: "User didnot vote for like" });
+    }
+  });
 };
+
 module.exports = {
   createTop5List,
   updateTop5List,
@@ -304,6 +328,9 @@ module.exports = {
   getTop5ListById,
   addComment,
 
-  upVoteList,
-  downVoteList,
+  removeLikeVote,
+  removeDislikeVote,
+
+  addLikeVote,
+  addDislikeVote,
 };

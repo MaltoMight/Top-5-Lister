@@ -6,7 +6,7 @@ const router = express.Router();
 
 // router.put("/top5list/:id", auth.verify, Top5ListController.updateTop5List);
 // router.delete("/top5list/:id", auth.verify, Top5ListController.deleteTop5List);
-// router.get("/top5list/:id", auth.verify, Top5ListController.getTop5ListById);
+router.get("/top5list/:id", auth.verify, Top5ListController.getTop5ListById);
 // router.get("/top5lists", auth.verify, Top5ListController.getTop5Lists);
 
 router.post("/register", UserController.registerUser);
@@ -25,7 +25,11 @@ router.get(
   Top5ListController.getUserAllTop5List
 );
 
-router.post("/upvote", Top5ListController.upVoteList);
-router.post("/downvote", Top5ListController.downVoteList);
+// **************************************************
+
+router.post("/removeLike", Top5ListController.removeLikeVote);
+router.post("/removeDislike", Top5ListController.removeDislikeVote);
+router.post("/addLike", Top5ListController.addLikeVote);
+router.post("/addDislike", Top5ListController.addDislikeVote);
 
 module.exports = router;

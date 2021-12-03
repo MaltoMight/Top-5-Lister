@@ -2,8 +2,7 @@ import { createContext, useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import jsTPS from "../common/jsTPS";
 import api from "../api";
-import MoveItem_Transaction from "../transactions/MoveItem_Transaction";
-import UpdateItem_Transaction from "../transactions/UpdateItem_Transaction";
+
 import AuthContext from "../auth";
 
 /*
@@ -270,27 +269,56 @@ function GlobalStoreContextProvider(props) {
       console.log("API FAILED TO GET THE LIST PAIRS");
     }
   };
+
   store.upVote = async function (listId) {
-    let email = auth.user.email;
-    let payload = {
-      userEmail: email,
-      listId: listId,
-    };
-    let response = await api.upVote(payload);
-    if (response.data.success) {
-      store.loadIdNamePairs();
+    try {
+      let payload = {
+        ownerEmail: auth.user.email,
+      };
+      let email = auth.user.email;
+      let response = await api.getTop5ListById(listId, payload);
+      if (response.data.success) {
+        payload = {
+          userEmail: email,
+          listId: listId,
+        };
+
+        // Check if the can vote up
+
+        response = await api.removeDislikeVote(payload);
+        // Add the vote on list
+        if (response.data.success) {
+          response = await api.addLikeVote(payload);
+          store.loadIdNamePairs();
+        }
+      }
+    } catch (error) {
+      console.log("error");
     }
   };
 
   store.downVote = async function (listId) {
-    let email = auth.user.email;
-    let payload = {
-      userEmail: email,
-      listId: listId,
-    };
-    let response = await api.downVote(payload);
-    if (response.data.success) {
-      store.loadIdNamePairs();
+    try {
+      let payload = {
+        ownerEmail: auth.user.email,
+      };
+      let email = auth.user.email;
+      let response = await api.getTop5ListById(listId, payload);
+      if (response.data.success) {
+        payload = {
+          userEmail: email,
+          listId: listId,
+        };
+        response = await api.removeLikeVote(payload);
+        console.log(response);
+        // Add the vote on list
+        if (response.data.success) {
+          response = await api.addDislikeVote(payload);
+          store.loadIdNamePairs();
+        }
+      }
+    } catch (error) {
+      console.log("error");
     }
   };
   // *****************************************************************************/
@@ -305,6 +333,5 @@ function GlobalStoreContextProvider(props) {
     </GlobalStoreContext.Provider>
   );
 }
-
 export default GlobalStoreContext;
 export { GlobalStoreContextProvider };
