@@ -55,6 +55,9 @@ export const removeDislikeVote = (payload) =>
 export const addLikeVote = (payload) => api.post("/addLike/", payload);
 export const addDislikeVote = (payload) => api.post("/addDislike/", payload);
 
+export const incrementViewListById = (payload) =>
+  api.post("/incrementView/", payload);
+
 const apis = {
   createTop5List,
   getAllTop5Lists,
@@ -75,6 +78,7 @@ const apis = {
 
   addLikeVote,
   addDislikeVote,
+  incrementViewListById,
 };
 
 export default apis;

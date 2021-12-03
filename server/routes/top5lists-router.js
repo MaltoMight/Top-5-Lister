@@ -25,11 +25,11 @@ router.get(
   Top5ListController.getUserAllTop5List
 );
 
-// **************************************************
+// *************************** STATS ***********************
 
 router.post("/removeLike", Top5ListController.removeLikeVote);
 router.post("/removeDislike", Top5ListController.removeDislikeVote);
 router.post("/addLike", Top5ListController.addLikeVote);
 router.post("/addDislike", Top5ListController.addDislikeVote);
-
+router.post("/incrementView", Top5ListController.incrementView);
 module.exports = router;

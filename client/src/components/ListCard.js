@@ -10,6 +10,7 @@ import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
 import { Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import Button from "@mui/material/Button";
 
 import CommentCard from "./CommentCard";
@@ -26,7 +27,7 @@ import Top5Item from "./Top5Item";
 function ListCard(props) {
   const { store } = useContext(GlobalStoreContext);
 
-  const [editActive, setEditActive] = useState(true);
+  const [expandedList, setExpandedList] = useState(false);
   const [text, setText] = useState("");
   const { idNamePair } = props;
   function handleComment(idList, comment) {
@@ -37,6 +38,33 @@ function ListCard(props) {
   }
   function handleDownVote() {
     store.downVote(idNamePair._id);
+  }
+  function handleExpandMoreList() {
+    setExpandedList(true);
+    store.addView(idNamePair._id);
+  }
+  function handleExpandLessList() {
+    setExpandedList(false);
+  }
+  function editManager() {
+    if (idNamePair.published) {
+      return (
+        <>
+          <Grid item>
+            <Typography>Published:</Typography>
+          </Grid>
+          <Grid item xs={14}>
+            <Typography>MM/DD/YYYY</Typography>
+          </Grid>
+        </>
+      );
+    } else {
+      return (
+        <Grid item xs={15}>
+          <Typography>Edit</Typography>
+        </Grid>
+      );
+    }
   }
 
   function containerTop(idNamePair) {
@@ -67,11 +95,13 @@ function ListCard(props) {
     );
   }
   function containerBot(idNamePair) {
+    let button = <ExpandMoreIcon onClick={() => handleExpandMoreList()} />;
+    if (expandedList) {
+      button = <ExpandLessIcon onClick={() => handleExpandLessList()} />;
+    }
     return (
       <Grid container direction="row" spacing={0} columns={20}>
-        <Grid item xs={15}>
-          <Typography>EDIT/PUBLISHED</Typography>
-        </Grid>
+        {editManager()}
 
         <Grid item ml={6}>
           <Typography>Views: </Typography>
@@ -81,16 +111,14 @@ function ListCard(props) {
             {idNamePair.stats.views}
           </Typography>
         </Grid>
-        <Grid>
-          <ExpandMoreIcon></ExpandMoreIcon>
-        </Grid>
+        <Grid>{button}</Grid>
       </Grid>
     );
   }
 
   function containerMiddle() {
     // If list is active
-    if (editActive) {
+    if (expandedList) {
       return (
         <Box>
           <Grid container>

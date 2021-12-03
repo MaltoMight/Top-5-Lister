@@ -277,7 +277,7 @@ addDislikeVote = async (req, res) => {
       .then(() => {
         return res
           .status(200)
-          .json({ success: true, error: "Added Dislike Success" });
+          .json({ success: true, message: "Added Dislike Success" });
       })
       .catch(() => {
         return res
@@ -319,6 +319,24 @@ removeDislikeVote = async (req, res) => {
   });
 };
 
+incrementView = async (req, res) => {
+  let { listId } = req.body;
+  Top5List.findOne({ _id: listId }, (err, top5List) => {
+    top5List.stats.views++;
+    top5List
+      .save()
+      .then(() => {
+        return res
+          .status(200)
+          .json({ success: true, message: "Incremented View" });
+      })
+      .catch(() => {
+        return res
+          .status(400)
+          .json({ success: false, error: "Error to increment the view" });
+      });
+  });
+};
 module.exports = {
   createTop5List,
   updateTop5List,
@@ -333,4 +351,6 @@ module.exports = {
 
   addLikeVote,
   addDislikeVote,
+
+  incrementView,
 };

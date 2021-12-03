@@ -321,6 +321,19 @@ function GlobalStoreContextProvider(props) {
       console.log("error");
     }
   };
+  store.addView = async function (listId) {
+    try {
+      let payload = {
+        listId: listId,
+      };
+      let response = await api.incrementViewListById(payload);
+      if (response.data.success) {
+        store.loadIdNamePairs();
+      }
+    } catch (error) {
+      console.log("error");
+    }
+  };
   // *****************************************************************************/
 
   return (
