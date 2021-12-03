@@ -122,7 +122,7 @@ function ListCard(props) {
       return (
         <Box>
           <Grid container>
-            <Top5Item />
+            <Top5Item key={idNamePair._id} idNamePair={idNamePair} />
             <Grid
               item
               container
