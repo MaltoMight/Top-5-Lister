@@ -34,31 +34,13 @@ function WorkspaceScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const history = useHistory();
+  const currentList = store.currentList;
+  const location = useLocation();
 
-  // Assuming is allowed first
   const [modalStatus, setModalStatus] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  let editItems = "";
-  if (store.currentList) {
-    editItems = (
-      <List id="edit-items" sx={{ width: "100%", bgcolor: "background.paper" }}>
-        {store.currentList.items.map((item, index) => (
-          <Top5Item
-            key={"top5-item-" + (index + 1)}
-            text={item}
-            index={index}
-          />
-        ))}
-      </List>
-    );
-  }
-  const location = useLocation();
-  const handleClose = () => {
-    setModalStatus(false);
-    history.push("/");
-  };
-
+  // console.log(auth);
   function checkPermission(id) {
     auth.tokenStatus().then((email) => {
       if (!email) {
@@ -81,48 +63,37 @@ function WorkspaceScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // [] makes to render only once
 
+  function itemList(index) {
+    if (!currentList) {
+      return null;
+    } else {
+      return currentList.items[index];
+    }
+  }
   function modalController() {
-    if (modalStatus) {
-      return (
-        <div id="top5-workspace">
-          <div id="workspace-edit">
-            <div id="edit-numbering">
-              <div className="item-number">
-                <Typography variant="h3">1.</Typography>
-              </div>
-              <div className="item-number">
-                <Typography variant="h3">2.</Typography>
-              </div>
-              <div className="item-number">
-                <Typography variant="h3">3.</Typography>
-              </div>
-              <div className="item-number">
-                <Typography variant="h3">4.</Typography>
-              </div>
-              <div className="item-number">
-                <Typography variant="h3">5.</Typography>
-              </div>
+    return (
+      <div id="top5-workspace">
+        <div id="workspace-edit">
+          <div id="edit-numbering">
+            <div className="item-number">
+              <Typography variant="h3">1. {itemList(0)}</Typography>
             </div>
-            {editItems}
+            <div className="item-number">
+              <Typography variant="h3">2. {itemList(1)}</Typography>
+            </div>
+            <div className="item-number">
+              <Typography variant="h3">3. {itemList(2)}</Typography>
+            </div>
+            <div className="item-number">
+              <Typography variant="h3">4. {itemList(3)} </Typography>
+            </div>
+            <div className="item-number">
+              <Typography variant="h3">5. {itemList(4)}</Typography>
+            </div>
           </div>
         </div>
-      );
-    } else {
-      return (
-        <Modal open={true}>
-          <Box sx={style}>
-            <Stack sx={{ width: "100%" }} spacing={2}>
-              <Alert severity="error">
-                {errorMessage}{" "}
-                <Button onClick={handleClose} variant="text">
-                  OK
-                </Button>
-              </Alert>
-            </Stack>
-          </Box>
-        </Modal>
-      );
-    }
+      </div>
+    );
   }
   return modalController();
 }

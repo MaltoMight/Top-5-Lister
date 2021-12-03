@@ -11,7 +11,6 @@ export default function StatusBar() {
 
   const { auth } = useContext(AuthContext);
   let isVisible = false;
-  let statusBar = null;
   const location = useLocation();
 
   function handleCreateNewList() {
@@ -21,29 +20,42 @@ export default function StatusBar() {
     // console.log("auth clicked:", auth);
   }
 
-  //Check if is visible
-  if (
-    location.pathname === "/community/" ||
-    location.pathname === "/community"
-  ) {
-    isVisible = true;
-  } else if (location.pathname === "/" && auth.loggedIn) {
-    isVisible = true;
-  }
-
   function statusBarManager() {
-    if (isVisible) {
+    if (location.pathname === "/") {
       return (
-        <div id="top5-statusbar">
+        <>
           <Button onClick={handleCreateNewList}>
             <AddIcon style={{ fontSize: "50px" }} sx={{ color: "black" }} />
           </Button>
+
           <Typography variant="h4">Your Lists</Typography>
-        </div>
+        </>
       );
-    } else {
-      return null;
+    } else if (location.pathname === "/all" || location.pathname === "/all/") {
+      return (
+        <>
+          <Typography variant="h4">ALL (from input field) Lists</Typography>
+        </>
+      );
+    } else if (
+      location.pathname === "/user" ||
+      location.pathname === "/user/"
+    ) {
+      return (
+        <>
+          <Typography variant="h4">User's Lists</Typography>
+        </>
+      );
+    } else if (
+      location.pathname === "/community" ||
+      location.pathname === "/community/"
+    ) {
+      return (
+        <>
+          <Typography variant="h4">Community Lists</Typography>
+        </>
+      );
     }
   }
-  return statusBarManager();
+  return <div id="top5-statusbar">{statusBarManager()} </div>;
 }

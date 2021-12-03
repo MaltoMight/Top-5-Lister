@@ -107,9 +107,6 @@ export default function AppBanner() {
   if (auth.loggedIn) {
     menu = loggedInMenu;
     editToolbar = <EditToolbar />;
-    // if (store.currentList) {
-    //   editToolbar = <EditToolbar />;
-    // }
   }
 
   // Display the circle
@@ -136,15 +133,7 @@ export default function AppBanner() {
               component="div"
               sx={{ display: { xs: "none", sm: "block" } }}
             >
-              <Link
-                onClick={() => {
-                  if (auth.loggedIn) {
-                    store.closeCurrentList();
-                  }
-                }}
-                style={{ textDecoration: "none" }}
-                to={"/"}
-              >
+              <Link style={{ textDecoration: "none" }} to={"#"}>
                 T<sup>5</sup>L
               </Link>
             </Typography>

@@ -40,9 +40,9 @@ function EditToolbar() {
   //   }
   // }
   function editCloseStatus() {
-    if (!store.currentList || store.isItemEditActive) {
-      return true;
-    } else return false;
+    // if (!store.currentList || store.isItemEditActive) {
+    //   return true;
+    // } else return false;
   }
   return (
     <div id="edit-toolbar">
