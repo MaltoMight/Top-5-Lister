@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Typography, Box, Grid } from "@mui/material";
+import { Typography, Box, Grid, IconButton } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import AuthContext from "../../auth";
 import { useContext } from "react";
@@ -71,9 +71,18 @@ export default function MenuBar() {
     }
   }
 
+  function colorManager() {
+    if (location.pathname.includes("top5list")) {
+      return "disabled";
+    } else {
+      return "enabled";
+    }
+  }
   function menuBar() {
     console.log("location:", location);
     let valid = false;
+    let clickable = false;
+    let homeClickable = false;
 
     let menuBar = null;
     let homeIconText = "disabled";
@@ -95,15 +104,26 @@ export default function MenuBar() {
       valid = true;
     }
     if (auth.loggedIn) {
+      if (location.pathname.includes("top5list")) {
+        clickable = true;
+        homeClickable = true;
+      } else {
+        clickable = false;
+        homeClickable = false;
+      }
+    }
+    if (auth.loggedIn) {
       homeIconText = "enabled";
       homeIcon = (
-        <Link to="/">
-          <HomeIcon
-            className={iconClassName(1)}
-            color={homeIconText}
-            style={{ fontSize: "30pt" }}
-          />
-        </Link>
+        <IconButton disabled={homeClickable}>
+          <Link to="/">
+            <HomeIcon
+              className={iconClassName(1)}
+              color={colorManager()}
+              style={{ fontSize: "30pt" }}
+            />
+          </Link>
+        </IconButton>
       );
     } else {
       homeIcon = <HomeIcon color={homeIconText} style={{ fontSize: "30pt" }} />;
@@ -118,36 +138,43 @@ export default function MenuBar() {
                 <Grid item></Grid>
                 <Grid item>{homeIcon}</Grid>
                 <Grid item>
-                  <Link to="/all">
-                    <GroupsIcon
-                      className={iconClassName(2)}
-                      color="enabled"
-                      style={{ fontSize: "30pt" }}
-                    />
-                  </Link>
+                  <IconButton disabled={clickable}>
+                    <Link to="/all">
+                      <GroupsIcon
+                        className={iconClassName(2)}
+                        color={colorManager()}
+                        style={{ fontSize: "30pt" }}
+                      />
+                    </Link>
+                  </IconButton>
                 </Grid>
                 <Grid item>
-                  <Link to="/user">
-                    <PersonIcon
-                      className={iconClassName(3)}
-                      color="enabled"
-                      style={{ fontSize: "30pt" }}
-                    />
-                  </Link>
+                  <IconButton disabled={clickable}>
+                    <Link to="/user">
+                      <PersonIcon
+                        className={iconClassName(3)}
+                        color={colorManager()}
+                        style={{ fontSize: "30pt" }}
+                      />
+                    </Link>
+                  </IconButton>
                 </Grid>
                 <Grid item>
-                  <Link to="/community">
-                    <FunctionsIcon
-                      className={iconClassName(4)}
-                      color="enabled"
-                      style={{ fontSize: "30pt" }}
-                    />
-                  </Link>
+                  <IconButton disabled={clickable}>
+                    <Link to="/community">
+                      <FunctionsIcon
+                        className={iconClassName(4)}
+                        color={colorManager()}
+                        style={{ fontSize: "30pt" }}
+                      />
+                    </Link>
+                  </IconButton>
                 </Grid>
                 <Grid item xs>
                   <TextField
                     size="small"
                     color="primary"
+                    disabled={clickable}
                     style={{ width: "60%" }}
                     label="Search"
                     InputProps={{ className: classes.input }}
@@ -157,7 +184,12 @@ export default function MenuBar() {
                   <Typography>SORT BY</Typography>
                 </Grid>
                 <Grid item>
-                  <SortIcon color="disabled" style={{ fontSize: "30pt" }} />
+                  <IconButton disabled={clickable}>
+                    <SortIcon
+                      color={colorManager()}
+                      style={{ fontSize: "30pt" }}
+                    />
+                  </IconButton>
                 </Grid>
               </Grid>
             </Box>
