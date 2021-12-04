@@ -1,18 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import Top5Item from "./Top5Item.js";
-import List from "@mui/material/List";
 import { Typography } from "@mui/material";
 import { GlobalStoreContext } from "../store/index.js";
 import AuthContext from "../auth";
-import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import WorkspaceItem from "./WorkspaceItem.js";
 import Button from "@mui/material/Button";
 import { useHistory } from "react-router-dom";
-
-import Alert from "@mui/material/Alert";
-import Stack from "@mui/material/Stack";
-import Modal from "@mui/material/Modal";
-
+import { Box } from "@mui/system";
+import { Grid } from "@mui/material";
 const style = {
   position: "absolute",
   top: "50%",
@@ -37,65 +33,226 @@ function WorkspaceScreen() {
   const currentList = store.currentList;
   const location = useLocation();
 
-  const [modalStatus, setModalStatus] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
-
   // console.log(auth);
-  function checkPermission(id) {
-    auth.tokenStatus().then((email) => {
-      if (!email) {
-        setModalStatus(false);
-        setErrorMessage("Unauthorized access");
-      } else {
-        store.restoreList(id, email).then((response) => {
-          setModalStatus(response.success);
-          setErrorMessage(response.message);
-        });
-      }
-    });
 
-    // console.log(auth);
-  }
   useEffect(() => {
     let pathName = location.pathname;
     let id = pathName.substring("/top5list/".length);
     checkPermission(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // [] makes to render only once
+  }, []);
 
-  function itemList(index) {
-    if (!currentList) {
-      return null;
-    } else {
-      return currentList.items[index];
-    }
+  function checkPermission(id) {
+    auth.tokenStatus().then((email) => {
+      if (!email) {
+        // setModalStatus(false);
+        // setErrorMessage("Unauthorized access");
+      } else {
+        store.restoreList(id, email).then((response) => {
+          // setModalStatus(response.success);
+          // setErrorMessage(response.message);
+        });
+      }
+    });
   }
   function modalController() {
-    return (
-      <div id="top5-workspace">
-        <div id="workspace-edit">
-          <div id="edit-numbering">
-            <div className="item-number">
-              <Typography variant="h3">1. {itemList(0)}</Typography>
-            </div>
-            <div className="item-number">
-              <Typography variant="h3">2. {itemList(1)}</Typography>
-            </div>
-            <div className="item-number">
-              <Typography variant="h3">3. {itemList(2)}</Typography>
-            </div>
-            <div className="item-number">
-              <Typography variant="h3">4. {itemList(3)} </Typography>
-            </div>
-            <div className="item-number">
-              <Typography variant="h3">5. {itemList(4)}</Typography>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    let itemList = "";
+    if (currentList) {
+      itemList = currentList.items.map((item) => {
+        return <WorkspaceItem />;
+      });
+      console.log(itemList);
+      return itemList;
+    }
   }
-  return modalController();
+  function getTitle() {
+    if (store.currentList) {
+      return store.currentList.name;
+    } else {
+      return "N/A";
+    }
+  }
+  let items;
+  if (currentList) {
+    items = currentList.items.map((item, index) => {
+      return <WorkspaceItem index={index} item={item} />;
+    });
+  }
+  return (
+    <div id="top5-workspace">
+      <Typography
+        ml={2}
+        mt={0.5}
+        pl={1}
+        sx={{ bgcolor: "white" }}
+        style={{ width: "50%", fontFamily: "Lexend Exa" }}
+      >
+        {getTitle()}
+      </Typography>
+      <Grid
+        container
+        direction="row"
+        mt={2}
+        ml={2}
+        mr={2}
+        style={{
+          "border-radius": "10px",
+          width: "98%",
+          height: "82%",
+          backgroundColor: "#2c2f70",
+        }}
+      >
+        <Grid
+          container
+          item
+          mt={2}
+          ml={2}
+          mr={2}
+          mb={2}
+          style={{
+            "border-radius": "10px",
+            width: "6%",
+            gap: 10,
+          }}
+          rowSpacing={5}
+          justifyContent="space-evenly"
+        >
+          <Box
+            display="flex"
+            width={"100%"}
+            bgcolor="#d4af36"
+            alignItems="center"
+            justifyContent="center"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">1.</Typography>
+          </Box>
+          <Box
+            display="flex"
+            width={"100%"}
+            bgcolor="#d4af36"
+            alignItems="center"
+            justifyContent="center"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">2.</Typography>
+          </Box>
+          <Box
+            display="inline-flex"
+            width={"100%"}
+            bgcolor="#d4af36"
+            alignItems="center"
+            justifyContent="center"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">3.</Typography>
+          </Box>
+          <Box
+            display="flex"
+            width={"100%"}
+            bgcolor="#d4af36"
+            alignItems="center"
+            justifyContent="center"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">4.</Typography>
+          </Box>
+          <Box
+            display="flex"
+            width={"100%"}
+            bgcolor="#d4af36"
+            alignItems="center"
+            justifyContent="center"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">5.</Typography>
+          </Box>
+        </Grid>
+        <Grid
+          mt={2}
+          mb={2}
+          mr={2}
+          item
+          container
+          style={{
+            "border-radius": "10px",
+            "flex-grow": "1",
+            width: "30%",
+            gap: 10,
+          }}
+        >
+          {items}
+          {/* <Box
+            display="flex"
+            width={"100%"}
+            bgcolor="lightgreen"
+            alignItems="center"
+            bgcolor="#d4af36"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">item</Typography>
+          </Box>
+          <Box
+            display="flex"
+            width={"100%"}
+            bgcolor="lightgreen"
+            alignItems="center"
+            bgcolor="#d4af36"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">item</Typography>
+          </Box>
+          <Box
+            display="flex"
+            width={"100%"}
+            bgcolor="lightgreen"
+            alignItems="center"
+            bgcolor="#d4af36"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">item</Typography>
+          </Box>
+          <Box
+            display="flex"
+            width={"100%"}
+            bgcolor="lightgreen"
+            alignItems="center"
+            bgcolor="#d4af36"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">item</Typography>
+          </Box>
+          <Box
+            display="flex"
+            width={"100%"}
+            bgcolor="lightgreen"
+            bgcolor="#d4af36"
+            alignItems="center"
+            style={{ "border-style": "solid", "border-radius": "10px" }}
+          >
+            <Typography variant="h3">item</Typography>
+          </Box> */}
+        </Grid>
+      </Grid>
+      <div id="workspace-button">
+        <Button
+          onClick={() => {
+            store.saveList();
+          }}
+        >
+          {" "}
+          Save
+        </Button>
+        <Button
+          onClick={() => {
+            store.publishList(currentList._id);
+          }}
+        >
+          Publish
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export default WorkspaceScreen;

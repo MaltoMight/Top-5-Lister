@@ -4,6 +4,8 @@ import TextField from "@mui/material/TextField";
 import { Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
+import { useHistory } from "react-router-dom";
+import AuthContext from "../auth";
 
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
@@ -26,6 +28,8 @@ import Top5Item from "./Top5Item";
 
 function ListCard(props) {
   const { store } = useContext(GlobalStoreContext);
+  const { auth } = useContext(AuthContext);
+  const history = useHistory();
 
   const [expandedList, setExpandedList] = useState(false);
   const [text, setText] = useState("");
@@ -46,6 +50,24 @@ function ListCard(props) {
   function handleExpandLessList() {
     setExpandedList(false);
   }
+  function handleEditList() {
+    store.setCurrentList(idNamePair._id);
+  }
+  function handleDeleteList() {
+    // store.DeleteList(idNamePair._id);
+  }
+  function deleteIconManager() {
+    let location = history.location.pathname.replace("/", "");
+    if (location === "" && auth.loggedIn) {
+      return (
+        <DeleteIcon
+          onClick={() => {
+            handleDeleteList();
+          }}
+        />
+      );
+    }
+  }
   function editManager() {
     if (idNamePair.published) {
       return (
@@ -60,9 +82,17 @@ function ListCard(props) {
       );
     } else {
       return (
-        <Grid item xs={15}>
-          <Typography>Edit</Typography>
-        </Grid>
+        <>
+          <Grid item xs={15}>
+            <Typography
+              onClick={() => {
+                handleEditList();
+              }}
+            >
+              Edit
+            </Typography>
+          </Grid>
+        </>
       );
     }
   }
@@ -87,10 +117,10 @@ function ListCard(props) {
         <ThumbDownOutlinedIcon
           onClick={() => handleDownVote()}
         ></ThumbDownOutlinedIcon>
-
         <Grid item>
           <Typography>{idNamePair.stats.dislike}</Typography>
         </Grid>
+        {deleteIconManager()}
       </Grid>
     );
   }
@@ -103,7 +133,7 @@ function ListCard(props) {
       <Grid container direction="row" spacing={0} columns={20}>
         {editManager()}
 
-        <Grid item ml={6}>
+        <Grid item ml={0}>
           <Typography>Views: </Typography>
         </Grid>
         <Grid item ml={3} xs={2}>

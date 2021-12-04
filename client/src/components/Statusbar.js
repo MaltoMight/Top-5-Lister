@@ -21,40 +21,48 @@ export default function StatusBar() {
   }
 
   function statusBarManager() {
-    if (location.pathname === "/") {
-      return (
-        <>
-          <Button onClick={handleCreateNewList}>
-            <AddIcon style={{ fontSize: "50px" }} sx={{ color: "black" }} />
-          </Button>
+    if (auth.loggedIn) {
+      location.pathname = location.pathname.replace("/", "");
+      if (location.pathname === "") {
+        return (
+          <>
+            <Button onClick={handleCreateNewList}>
+              <AddIcon style={{ fontSize: "50px" }} sx={{ color: "black" }} />
+            </Button>
 
-          <Typography variant="h4">Your Lists</Typography>
-        </>
-      );
-    } else if (location.pathname === "/all" || location.pathname === "/all/") {
-      return (
-        <>
-          <Typography variant="h4">ALL (from input field) Lists</Typography>
-        </>
-      );
-    } else if (
-      location.pathname === "/user" ||
-      location.pathname === "/user/"
-    ) {
-      return (
-        <>
-          <Typography variant="h4">User's Lists</Typography>
-        </>
-      );
-    } else if (
-      location.pathname === "/community" ||
-      location.pathname === "/community/"
-    ) {
-      return (
-        <>
-          <Typography variant="h4">Community Lists</Typography>
-        </>
-      );
+            <Typography variant="h4">Your Lists</Typography>
+          </>
+        );
+      } else if (location.pathname.includes("top5list")) {
+        return (
+          <>
+            <Button disabled>
+              <AddIcon style={{ fontSize: "50px" }} />
+            </Button>
+            <Typography color="textDisabled" variant="h4">
+              Your Lists
+            </Typography>
+          </>
+        );
+      } else if (location.pathname === "all") {
+        return (
+          <>
+            <Typography variant="h4">ALL (from input field) Lists</Typography>
+          </>
+        );
+      } else if (location.pathname === "user") {
+        return (
+          <>
+            <Typography variant="h4">User's Lists</Typography>
+          </>
+        );
+      } else if (location.pathname === "community") {
+        return (
+          <>
+            <Typography variant="h4">Community Lists</Typography>
+          </>
+        );
+      }
     }
   }
   return <div id="top5-statusbar">{statusBarManager()} </div>;

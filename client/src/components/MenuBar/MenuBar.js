@@ -51,26 +51,15 @@ export default function MenuBar() {
     homeIconText = "enabled";
   }
   function iconClassName(number) {
-    if (
-      (location.pathname === "/" || location.pathname === "/") &&
-      number === 1
-    ) {
+    let check = location.pathname.replace("/", "");
+
+    if ((check === "" || check.includes("top5list")) && number === 1) {
       return "selectedIcon";
-    } else if (
-      (location.pathname === "/all" || location.pathname === "/group/") &&
-      number === 2
-    ) {
+    } else if (check === "all" && number === 2) {
       return "selectedIcon";
-    } else if (
-      (location.pathname === "/user" || location.pathname === "/user/") &&
-      number === 3
-    ) {
+    } else if (check === "user" && number === 3) {
       return "selectedIcon";
-    } else if (
-      (location.pathname === "/community" ||
-        location.pathname === "/community/") &&
-      number === 4
-    ) {
+    } else if (check === "community" && number === 4) {
       return "selectedIcon";
     } else {
       return "non-selectedIcon";

@@ -27,6 +27,9 @@ updateTop5List = async (req, res) => {
     console.log("req", req);
     top5List.name = body.name;
     top5List.items = body.items;
+    top5List.published = body.published;
+    top5List.comments = body.comments;
+    top5List.stats = body.stats;
     top5List
       .save()
       .then(() => {

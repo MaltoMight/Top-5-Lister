@@ -349,6 +349,38 @@ function GlobalStoreContextProvider(props) {
       });
     }
   };
+
+  store.publishList = async function (listId) {
+    let payload = { ownerEmail: auth.user.email };
+
+    let response = await api.getTop5ListById(listId, payload);
+    if (response.data.success) {
+      let top5List = response.data.top5List;
+      top5List.published = true;
+      response = await api.updateTop5ListById(top5List._id, top5List);
+      if (response.data.success) {
+        storeReducer({
+          type: GlobalStoreActionType.SET_CURRENT_LIST,
+          payload: top5List,
+        });
+        history.push("/");
+      }
+    }
+  };
+  store.saveList = async function () {
+    const response = await api.updateTop5ListById(
+      store.currentList._id,
+      store.currentList
+    );
+
+    if (response.data.success) {
+      storeReducer({
+        type: GlobalStoreActionType.SET_CURRENT_LIST,
+        payload: store.currentList,
+      });
+      history.push("/");
+    }
+  };
   // *****************************************************************************/
 
   return (
