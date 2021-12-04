@@ -16,6 +16,7 @@ import DeleteModal from "./DeleteModal.js";
 
 const HomeScreen = () => {
   const { store } = useContext(GlobalStoreContext);
+
   // const { auth } = useContext(AuthContext);
   useEffect(() => {
     store.loadIdNamePairs();

@@ -65,12 +65,25 @@ function WorkspaceScreen() {
       return itemList;
     }
   }
+  const handleTitleChange = () => {
+    console.log("");
+  };
   function getTitle() {
-    if (store.currentList) {
-      return store.currentList.name;
-    } else {
-      return "N/A";
-    }
+    let title = store.currentList ? store.currentList.name : "N/A";
+
+    return (
+      <TextField
+        size="small"
+        sx={{ bgcolor: "white" }}
+        defaultValue={title}
+        onChange={handleTitleChange}
+        style={{
+          "border-radius": "10px",
+          width: "50%",
+          fontFamily: "Lexend Exa",
+        }}
+      />
+    );
   }
   let items;
   if (currentList) {
@@ -80,15 +93,9 @@ function WorkspaceScreen() {
   }
   return (
     <div id="top5-workspace">
-      <Typography
-        ml={2}
-        mt={0.5}
-        pl={1}
-        sx={{ bgcolor: "white" }}
-        style={{ width: "50%", fontFamily: "Lexend Exa" }}
-      >
+      <Box ml={1} mt={1} pl={1}>
         {getTitle()}
-      </Typography>
+      </Box>
       <Grid
         container
         direction="row"

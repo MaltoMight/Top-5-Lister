@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { GlobalStoreContext } from "../store";
 import TextField from "@mui/material/TextField";
-import { Grid } from "@mui/material";
+import { Grid, IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import { useHistory } from "react-router-dom";
@@ -37,10 +37,10 @@ function ListCard(props) {
   function handleComment(idList, comment) {
     store.addComment(idList, comment);
   }
-  function handleUpVote() {
+  async function handleUpVote() {
     store.upVote(idNamePair._id);
   }
-  function handleDownVote() {
+  async function handleDownVote() {
     store.downVote(idNamePair._id);
   }
   function handleExpandMoreList() {
@@ -108,15 +108,19 @@ function ListCard(props) {
         </Grid>
 
         <ThumbUpAltOutlinedIcon
-          onClick={() => handleUpVote()}
+          onClick={() => {
+            handleUpVote();
+          }}
         ></ThumbUpAltOutlinedIcon>
 
         <Grid item mr={2}>
           <Typography>{idNamePair.stats.like}</Typography>
         </Grid>
+
         <ThumbDownOutlinedIcon
           onClick={() => handleDownVote()}
         ></ThumbDownOutlinedIcon>
+
         <Grid item>
           <Typography>{idNamePair.stats.dislike}</Typography>
         </Grid>
