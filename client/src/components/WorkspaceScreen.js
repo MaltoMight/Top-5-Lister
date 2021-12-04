@@ -33,6 +33,7 @@ function WorkspaceScreen() {
   const currentList = store.currentList;
   const location = useLocation();
   const [titleName, setTitleName] = useState("");
+  const [firstChange, setFirstChange] = useState(false);
 
   // console.log(auth);
 
@@ -50,6 +51,9 @@ function WorkspaceScreen() {
         // setErrorMessage("Unauthorized access");
       } else {
         store.restoreList(id, email).then((response) => {
+          if (response.success) {
+            setTitleName(store.currentList.name);
+          }
           // setModalStatus(response.success);
           // setErrorMessage(response.message);
         });
@@ -59,10 +63,19 @@ function WorkspaceScreen() {
 
   const handleTitleChange = (event) => {
     setTitleName(event.target.value);
+    setFirstChange(true);
   };
-  const handleSaveList = () => {
-    store.currentList.name = titleName;
-    store.saveList();
+  const handleSaveList = (event) => {
+    if (titleName === "" && !firstChange) {
+      store.saveList();
+    } else if (titleName === "" && firstChange) {
+      store.currentList.name = "    ";
+      store.saveList();
+    } else {
+      store.currentList.name = titleName;
+
+      store.saveList();
+    }
   };
   function getTitle() {
     let title = store.currentList ? store.currentList.name : "N/A";
