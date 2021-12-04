@@ -32,6 +32,7 @@ function WorkspaceScreen() {
   const history = useHistory();
   const currentList = store.currentList;
   const location = useLocation();
+  const [titleName, setTitleName] = useState("");
 
   // console.log(auth);
 
@@ -65,8 +66,12 @@ function WorkspaceScreen() {
       return itemList;
     }
   }
-  const handleTitleChange = () => {
-    console.log("");
+  const handleTitleChange = (event) => {
+    setTitleName(event.target.value);
+  };
+  const handleSaveList = () => {
+    store.currentList.name = titleName;
+    store.saveList();
   };
   function getTitle() {
     let title = store.currentList ? store.currentList.name : "N/A";
@@ -242,14 +247,7 @@ function WorkspaceScreen() {
         </Grid>
       </Grid>
       <div id="workspace-button">
-        <Button
-          onClick={() => {
-            store.saveList();
-          }}
-        >
-          {" "}
-          Save
-        </Button>
+        <Button onClick={handleSaveList}> Save</Button>
         <Button
           onClick={() => {
             store.publishList(currentList._id);
