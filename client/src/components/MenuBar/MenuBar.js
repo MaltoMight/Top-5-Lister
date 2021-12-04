@@ -6,6 +6,7 @@ import AuthContext from "../../auth";
 import { useContext } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { Link } from "react-router-dom";
+import { GlobalStoreContext } from "../../store/index.js";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import HomeIcon from "@mui/icons-material/HomeOutlined";
@@ -45,6 +46,7 @@ export default function MenuBar() {
   const location = useLocation();
   const { auth } = useContext(AuthContext);
   const classes = useStyles();
+  const { store } = useContext(GlobalStoreContext);
 
   let homeIconText = "disabled";
   if (auth.loggedIn) {
@@ -53,7 +55,10 @@ export default function MenuBar() {
   function iconClassName(number) {
     let check = location.pathname.replace("/", "");
 
-    if ((check === "" || check.includes("top5list")) && number === 1) {
+    if (
+      (check === "" || (check.includes("top5list") && store.currentList)) &&
+      number === 1
+    ) {
       return "selectedIcon";
     } else if (check === "all" && number === 2) {
       return "selectedIcon";
