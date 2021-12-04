@@ -70,13 +70,16 @@ function ListCard(props) {
   }
   function editManager() {
     if (idNamePair.published) {
+      let date = idNamePair.createdAt;
       return (
         <>
           <Grid item>
             <Typography>Published:</Typography>
           </Grid>
-          <Grid item xs={14}>
-            <Typography>MM/DD/YYYY</Typography>
+          <Grid item ml={1} xs={14}>
+            <Typography color={"green"}>
+              {date[1]} {date[2]}, {date[3]}
+            </Typography>
           </Grid>
         </>
       );
@@ -85,6 +88,12 @@ function ListCard(props) {
         <>
           <Grid item xs={15}>
             <Typography
+              color={"red"}
+              style={{
+                display: "inline-flex",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
               onClick={() => {
                 handleEditList();
               }}

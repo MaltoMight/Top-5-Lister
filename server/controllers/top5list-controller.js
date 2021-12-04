@@ -1,9 +1,8 @@
 const Top5List = require("../models/top5list-model");
 const mongoose = require("mongoose");
 
-const LIKE = 0;
-const DISLIKE = 1;
-
+// const LIKE = 0;
+// const DISLIKE = 1;
 updateTop5List = async (req, res) => {
   const body = req.body;
   console.log("updateTop5List: " + JSON.stringify(body));
@@ -169,6 +168,7 @@ getUserAllTop5List = async (req, res) => {
           lastName: list.lastName,
           comments: list.comments,
           published: list.published,
+          createdAt: list.createdAt.toString().split(" "),
         };
         pairs.push(pair);
       }

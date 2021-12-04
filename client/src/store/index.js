@@ -381,6 +381,7 @@ function GlobalStoreContextProvider(props) {
       history.push("/");
     }
   };
+
   // *****************************************************************************/
 
   return (

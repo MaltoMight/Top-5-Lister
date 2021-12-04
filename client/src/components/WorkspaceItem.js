@@ -1,13 +1,20 @@
 import { Box } from "@mui/system";
 import { Typography, TextField } from "@mui/material";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { GlobalStoreContext } from "../store";
 
 export default function WorskpaceItem(props) {
   const [editActive, setEditActive] = useState(false);
+  const { store } = useContext(GlobalStoreContext);
+
   function handleClick() {
     console.log("index:", props.index);
   }
-
+  const handleChange = (event) => {
+    if (store.currentList) {
+      store.currentList.items[props.index] = event.target.value;
+    }
+  };
   return (
     <Box
       display="flex"
@@ -18,8 +25,11 @@ export default function WorskpaceItem(props) {
       bgcolor="#d4af36"
       style={{ "border-style": "solid", "border-radius": "10px" }}
     >
-      <TextField defaultValue={props.item} />
-      {/* <Typography variant="h3">{props.item}</Typography> */}
+      <TextField
+        onChange={handleChange}
+        style={{ flexGrow: "1" }}
+        defaultValue={props.item}
+      />
     </Box>
   );
 }
