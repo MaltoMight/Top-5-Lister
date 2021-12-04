@@ -7,6 +7,7 @@ export default function WorskpaceItem(props) {
   function handleClick() {
     console.log("index:", props.index);
   }
+
   return (
     <Box
       display="flex"
@@ -17,7 +18,8 @@ export default function WorskpaceItem(props) {
       bgcolor="#d4af36"
       style={{ "border-style": "solid", "border-radius": "10px" }}
     >
-      <Typography variant="h3">{props.item}</Typography>
+      <TextField defaultValue={props.item} />
+      {/* <Typography variant="h3">{props.item}</Typography> */}
     </Box>
   );
 }
