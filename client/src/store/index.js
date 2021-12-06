@@ -170,6 +170,7 @@ function GlobalStoreContextProvider(props) {
           sortCode: -1,
         });
       }
+
       default:
         return store;
     }
@@ -597,6 +598,15 @@ function GlobalStoreContextProvider(props) {
   // ALL list
   store.loadAllPublishedList = async function () {
     const response = await api.loadAllPublishedList();
+    // if (response.data.success) {
+    //   let pairsArray = response.data.idNamePairs;
+    //   storeReducer({
+    //     type: GlobalStoreActionType.LOAD_HOMEPAGE_LIST,
+    //     payload: pairsArray,
+    //   });
+    // } else {
+    //   console.log("API FAILED TO GET ALL THE PUBLIC LISTS");
+    // }
   };
   // ******************************************************************************/
   return (

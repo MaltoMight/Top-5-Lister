@@ -178,6 +178,10 @@ getUserAllTop5List = async (req, res) => {
   }).catch((err) => console.log(err));
 };
 
+getAllPublishedLists = async (req, res) => {
+  console.log("retrieving all the published lists");
+};
+
 addComment = async (req, res) => {
   console.log("adding comment");
   // console.log("req:", req);
@@ -355,6 +359,6 @@ module.exports = {
 
   addLikeVote,
   addDislikeVote,
-
+  getAllPublishedLists,
   incrementView,
 };

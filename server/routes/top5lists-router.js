@@ -8,6 +8,7 @@ router.put("/top5list/:id", auth.verify, Top5ListController.updateTop5List);
 router.delete("/top5list/:id", auth.verify, Top5ListController.deleteTop5List);
 router.get("/top5list/:id", auth.verify, Top5ListController.getTop5ListById);
 // router.get("/top5lists", auth.verify, Top5ListController.getTop5Lists);
+router.get("/allLists", Top5ListController.getAllPublishedLists);
 
 router.post("/register", UserController.registerUser);
 router.get("/loggedIn", UserController.getLoggedIn);

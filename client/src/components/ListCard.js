@@ -59,7 +59,11 @@ function ListCard(props) {
   }
   function deleteIconManager() {
     let location = history.location.pathname.replace("/", "");
-    if (location === "" && auth.loggedIn) {
+    if (
+      location === "" &&
+      auth.loggedIn &&
+      auth.user.email === idNamePair.ownerEmail
+    ) {
       return (
         <DeleteIcon
           onClick={() => {
@@ -168,6 +172,37 @@ function ListCard(props) {
 
   function containerMiddle() {
     // If list is active
+    // if(auth.user)
+    let commentDiv = (
+      <TextField
+        label="Add Comment"
+        onKeyPress={(event) => {
+          if (event.key === "Enter" && event.target.value !== "") {
+            handleComment(idNamePair._id, event.target.value);
+            event.target.value = "";
+          }
+        }}
+        style={{
+          marginTop: "20px",
+
+          width: "100%",
+        }}
+      ></TextField>
+    );
+    if (auth.user === null) {
+      commentDiv = (
+        <TextField
+          label="Login in order to comment"
+          disabled={true}
+          style={{
+            marginTop: "20px",
+
+            width: "100%",
+          }}
+        ></TextField>
+      );
+    }
+
     if (expandedList) {
       return (
         <Box>
@@ -203,23 +238,7 @@ function ListCard(props) {
                   ))}
                 </List>
               </Grid>
-              <Grid item>
-                {" "}
-                <TextField
-                  label="Add Comment"
-                  onKeyPress={(event) => {
-                    if (event.key === "Enter" && event.target.value !== "") {
-                      handleComment(idNamePair._id, event.target.value);
-                      event.target.value = "";
-                    }
-                  }}
-                  style={{
-                    marginTop: "20px",
-
-                    width: "100%",
-                  }}
-                ></TextField>
-              </Grid>
+              <Grid item> {commentDiv}</Grid>
             </Grid>
           </Grid>
         </Box>
