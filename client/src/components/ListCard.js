@@ -14,6 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import Button from "@mui/material/Button";
+import DeleteModal from "./DeleteModal.js";
 
 import CommentCard from "./CommentCard";
 import Top5Item from "./Top5Item";
@@ -54,7 +55,7 @@ function ListCard(props) {
     store.setCurrentList(idNamePair._id);
   }
   function handleDeleteList() {
-    // store.DeleteList(idNamePair._id);
+    store.markListForDeletion(idNamePair._id);
   }
   function deleteIconManager() {
     let location = history.location.pathname.replace("/", "");
@@ -70,7 +71,10 @@ function ListCard(props) {
   }
   function editManager() {
     if (idNamePair.published) {
-      let date = idNamePair.createdAt;
+      let options = { month: "short" };
+
+      let date = new Date(idNamePair.createdAt);
+      let x = 2;
       return (
         <>
           <Grid item>
@@ -78,7 +82,10 @@ function ListCard(props) {
           </Grid>
           <Grid item ml={1} xs={14}>
             <Typography color={"green"}>
-              {date[1]} {date[2]}, {date[3]}
+              {new Intl.DateTimeFormat("en-US", options).format(
+                date.getMonth()
+              )}{" "}
+              {date.getDate()}, {date.getFullYear()}
             </Typography>
           </Grid>
         </>
@@ -245,38 +252,43 @@ function ListCard(props) {
   // Blue = LIST already published - #d4d4f5
 
   // Yellowish = List not published - #fffff0
+  function cardElementManager() {
+    if (store.listMarkedForDeletion) {
+      return <DeleteModal />;
+    } else {
+      return (
+        <List
+          item
+          id={idNamePair._id}
+          key={idNamePair._id}
+          sx={{
+            marginTop: "15px",
+            p: 1,
+            display: "flex",
+            // flexWrap: "wrap",
+            // bgcolor: "background.paper",
+            bgcolor: colorStatus(),
+            border: "2px solid #000",
+            borderRadius: 3,
+          }}
+          // button
+          // onClick={(event) => {
+          //   handleLoadList(event, idNamePair._id);
+          // }}
+          style={{
+            fontSize: "48pt",
+            width: "100%",
+          }}
+        >
+          <Box width={"100%"} style={{ overflow: "hidden" }}>
+            {container(idNamePair)}
+          </Box>
+        </List>
+      );
+    }
+  }
 
-  let cardElement = (
-    <List
-      item
-      id={idNamePair._id}
-      key={idNamePair._id}
-      sx={{
-        marginTop: "15px",
-        p: 1,
-        display: "flex",
-        // flexWrap: "wrap",
-        // bgcolor: "background.paper",
-        bgcolor: colorStatus(),
-        border: "2px solid #000",
-        borderRadius: 3,
-      }}
-      // button
-      // onClick={(event) => {
-      //   handleLoadList(event, idNamePair._id);
-      // }}
-      style={{
-        fontSize: "48pt",
-        width: "100%",
-      }}
-    >
-      <Box width={"100%"} style={{ overflow: "hidden" }}>
-        {container(idNamePair)}
-      </Box>
-    </List>
-  );
-
-  return cardElement;
+  return cardElementManager();
 }
 
 export default ListCard;

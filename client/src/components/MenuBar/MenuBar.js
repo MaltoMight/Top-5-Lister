@@ -52,6 +52,9 @@ export default function MenuBar() {
   if (auth.loggedIn) {
     homeIconText = "enabled";
   }
+  function handleSort() {
+    store.sortListByLike();
+  }
   function iconClassName(number) {
     let check = location.pathname.replace("/", "");
 
@@ -188,6 +191,7 @@ export default function MenuBar() {
                     <SortIcon
                       color={colorManager()}
                       style={{ fontSize: "30pt" }}
+                      onClick={handleSort}
                     />
                   </IconButton>
                 </Grid>

@@ -19,7 +19,8 @@ const HomeScreen = () => {
 
   // const { auth } = useContext(AuthContext);
   useEffect(() => {
-    store.loadIdNamePairs();
+    store.restoreHomePage();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -22,8 +22,8 @@ export default function StatusBar() {
 
   function statusBarManager() {
     if (auth.loggedIn) {
-      location.pathname = location.pathname.replace("/", "");
-      if (location.pathname === "") {
+      let path = location.pathname.replace("/", "");
+      if (path === "") {
         return (
           <>
             <Button onClick={handleCreateNewList}>
@@ -33,7 +33,7 @@ export default function StatusBar() {
             <Typography variant="h4">Your Lists</Typography>
           </>
         );
-      } else if (location.pathname.includes("top5list")) {
+      } else if (path.includes("top5list")) {
         return (
           <>
             <Button disabled>
@@ -44,19 +44,19 @@ export default function StatusBar() {
             </Typography>
           </>
         );
-      } else if (location.pathname === "all") {
+      } else if (path === "all") {
         return (
           <>
             <Typography variant="h4">ALL (from input field) Lists</Typography>
           </>
         );
-      } else if (location.pathname === "user") {
+      } else if (path === "user") {
         return (
           <>
             <Typography variant="h4">User's Lists</Typography>
           </>
         );
-      } else if (location.pathname === "community") {
+      } else if (path === "community") {
         return (
           <>
             <Typography variant="h4">Community Lists</Typography>

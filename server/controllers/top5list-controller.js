@@ -68,6 +68,7 @@ getTop5ListById = async (req, res) => {
 
   console.log("ownerEmail:", ownerEmail);
   let isValidId = mongoose.Types.ObjectId.isValid(req.params.id);
+
   if (!isValidId) {
     return res.status(400).json({ success: false, error: "Invalid Id" });
   }
@@ -168,7 +169,7 @@ getUserAllTop5List = async (req, res) => {
           lastName: list.lastName,
           comments: list.comments,
           published: list.published,
-          createdAt: list.createdAt.toString().split(" "),
+          createdAt: list.createdAt,
         };
         pairs.push(pair);
       }

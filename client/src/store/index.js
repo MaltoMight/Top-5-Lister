@@ -28,6 +28,8 @@ export const GlobalStoreActionType = {
   SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE",
   SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
   CLOSE_ITEM_EDIT_ACTIVE: "CLOSE_ITEM_EDIT_ACTIVE",
+  LOAD_SORTED_LIST: "LOAD_SORTED_LIST",
+  LOAD_HOMEPAGE_LIST: "LOAD_HOMEPAGE_LIST",
 };
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -45,6 +47,7 @@ function GlobalStoreContextProvider(props) {
     itemActive: false,
     listMarkedForDeletion: null,
     currentPage: 0, // 0 -> home page , 1 -> all list page, 2 -> user list, 3 -> communitylist page
+    sortCode: -1,
   });
   const history = useHistory();
 
@@ -65,6 +68,7 @@ function GlobalStoreContextProvider(props) {
           isListNameEditActive: false,
           isItemEditActive: false,
           listMarkedForDeletion: null,
+          sortCode: store.sortCode,
         });
       }
       // GET ALL THE LISTS SO WE CAN PRESENT THEM
@@ -76,6 +80,7 @@ function GlobalStoreContextProvider(props) {
           isListNameEditActive: false,
           isItemEditActive: false,
           listMarkedForDeletion: null,
+          sortCode: store.sortCode,
         });
       }
 
@@ -92,6 +97,7 @@ function GlobalStoreContextProvider(props) {
           isItemEditActive: store.isItemEditActive,
           listMarkedForDeletion: store.listMarkedForDeletion,
           currentPage: payload,
+          sortCode: -1,
         });
       }
       case GlobalStoreActionType.SET_CURRENT_LIST: {
@@ -103,6 +109,65 @@ function GlobalStoreContextProvider(props) {
           isItemEditActive: false,
           listMarkedForDeletion: null,
           currentPage: store.currentPage,
+          sortCode: store.sortCode,
+        });
+      }
+      case GlobalStoreActionType.CLOSE_CURRENT_LIST: {
+        return setStore({
+          idNamePairs: store.idNamePairs,
+          currentList: null,
+          newListCounter: store.newListCounter,
+          isListNameEditActive: false,
+          isItemEditActive: false,
+          listMarkedForDeletion: null,
+          currentPage: store.currentPage,
+          sortCode: store.sortCode,
+        });
+      }
+      case GlobalStoreActionType.MARK_LIST_FOR_DELETION: {
+        return setStore({
+          idNamePairs: store.idNamePairs,
+          currentList: null,
+          newListCounter: store.newListCounter,
+          isListNameEditActive: false,
+          isItemEditActive: false,
+          listMarkedForDeletion: payload,
+          currentPage: store.currentPage,
+          sortCode: store.sortCode,
+        });
+      }
+      case GlobalStoreActionType.UNMARK_LIST_FOR_DELETION: {
+        return setStore({
+          idNamePairs: store.idNamePairs,
+          currentList: null,
+          newListCounter: store.newListCounter,
+          isListNameEditActive: false,
+          isItemEditActive: false,
+          listMarkedForDeletion: null,
+          currentPage: store.currentPage,
+          sortCode: store.sortCode,
+        });
+      }
+      case GlobalStoreActionType.LOAD_SORTED_LIST: {
+        return setStore({
+          idNamePairs: payload.newList,
+          currentList: null,
+          newListCounter: store.newListCounter,
+          isListNameEditActive: false,
+          isItemEditActive: false,
+          listMarkedForDeletion: null,
+          sortCode: payload.sortCode,
+        });
+      }
+      case GlobalStoreActionType.LOAD_HOMEPAGE_LIST: {
+        return setStore({
+          idNamePairs: payload,
+          currentList: null,
+          newListCounter: store.newListCounter,
+          isListNameEditActive: false,
+          isItemEditActive: false,
+          listMarkedForDeletion: null,
+          sortCode: -1,
         });
       }
       default:
@@ -313,7 +378,11 @@ function GlobalStoreContextProvider(props) {
       };
       let response = await api.incrementViewListById(payload);
       if (response.data.success) {
-        store.loadIdNamePairs();
+        if (store.sortCode != -1) {
+          store.sortCurrentListLoaded();
+        } else {
+          store.loadIdNamePairs();
+        }
       }
     } catch (error) {
       console.log("error");
@@ -382,8 +451,154 @@ function GlobalStoreContextProvider(props) {
     }
   };
 
+  // WHen user initializes the deletion process
+  store.markListForDeletion = async function (id) {
+    let payload = {
+      ownerEmail: auth.user.email,
+    };
+    let response = await api.getTop5ListById(id, payload);
+    if (response.data.success) {
+      let top5List = response.data.top5List;
+      storeReducer({
+        type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
+        payload: top5List,
+      });
+    }
+  };
+  store.deleteMarkedList = async function () {
+    store.deleteList(store.listMarkedForDeletion._id);
+  };
+  // dELETEs after user's confirmation
+  store.deleteList = async function (idList) {
+    let response = await api.deleteTop5ListById(idList);
+    if (response.data.success) {
+      store.loadIdNamePairs();
+      history.push("/");
+    }
+  };
+  store.hideDeleteListmodal = async function () {
+    storeReducer({
+      type: GlobalStoreActionType.HIDE_DELETE_LIST.ADD_COMMENT_LIST,
+      payload: null,
+    });
+    store.closeCurrentList();
+  };
+  store.closeCurrentList = async function () {
+    storeReducer({
+      type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
+      payload: {},
+    });
+    history.push("/");
+  };
+  store.hideDeleteListModal = function () {
+    storeReducer({
+      type: GlobalStoreActionType.HIDE_DELETE_LIST,
+      payload: null,
+    });
+    store.closeCurrentList();
+  };
+
+  // Internally sort method
+  store.sortListByCode = function (sortType) {
+    let currentList = store.idNamePairs;
+    if (!currentList) {
+      return false;
+    }
+    // 1. sorting by newest date
+    // 2. sorting by oldest date
+    // 3. sorting by views
+    // 4. sorting by like
+    // 5. sorting by dislike
+    let nonPublishedList = currentList.filter(function (obj) {
+      return obj.published === false;
+    });
+    let publishedList = currentList.filter(function (obj) {
+      return obj.published === true;
+    });
+    switch (sortType) {
+      case 1:
+        publishedList.sort((a, b) => {
+          let dateA = new Date(a.createdAt);
+          let dateB = new Date(b.createdAt);
+          return dateB - dateA;
+        });
+        break;
+      case 2:
+        publishedList.sort((a, b) => {
+          let dateA = new Date(a.createdAt);
+          let dateB = new Date(b.createdAt);
+
+          return dateA - dateB;
+        });
+        break;
+      case 3:
+        publishedList.sort((a, b) => (a.stats.views > b.stats.views ? 1 : -1));
+        break;
+      case 4:
+        publishedList.sort((a, b) => (a.stats.like > b.stats.like ? 1 : -1));
+        break;
+      case 5:
+        publishedList.sort((a, b) =>
+          a.stats.dislike > b.stats.dislike ? 1 : -1
+        );
+        break;
+      default:
+        return false;
+    }
+    let payload = {
+      newList: publishedList.concat(nonPublishedList),
+      sortCode: sortType,
+    };
+    let newList = publishedList.concat(nonPublishedList);
+    storeReducer({
+      type: GlobalStoreActionType.LOAD_SORTED_LIST,
+      payload: payload,
+    });
+  };
+
+  // Externally sort methods
+  store.sortListByNewestDate = function () {
+    store.sortListByCode(1);
+  };
+  store.sortListByOldestDate = function () {
+    store.sortListByCode(2);
+  };
+  store.sortListByViews = function () {
+    store.sortListByCode(3);
+  };
+  store.sortListByLike = function () {
+    store.sortListByCode(2);
+  };
+  store.sortListByDislike = function () {
+    store.sortListByCode(5);
+  };
+
+  store.sortCurrentListLoaded = function () {
+    store.sortListByCode(store.sortCode);
+  };
+
+  store.restoreHomePage = async function () {
+    let payload = {
+      ownerEmail: auth.user.email,
+    };
+    const response = await api.getUserAllTop5List(payload);
+    if (response.data.success) {
+      let pairsArray = response.data.idNamePairs;
+      storeReducer({
+        type: GlobalStoreActionType.LOAD_HOMEPAGE_LIST,
+        payload: pairsArray,
+      });
+    } else {
+      console.log("API FAILED TO GET THE LIST PAIRS");
+    }
+  };
   // *****************************************************************************/
 
+  // ALL list
+  store.loadAllPublishedList = async function () {
+    const response = await api.loadAllPublishedList();
+  };
+  // ******************************************************************************/
   return (
     <GlobalStoreContext.Provider
       value={{
