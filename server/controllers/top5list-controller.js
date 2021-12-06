@@ -180,6 +180,44 @@ getUserAllTop5List = async (req, res) => {
 
 getAllPublishedLists = async (req, res) => {
   console.log("retrieving all the published lists");
+  await Top5List.find({ published: true }, (err, top5Lists) => {
+    if (err) {
+      return res.status(400).json({ success: false, error: err });
+    }
+    if (!top5Lists) {
+      console.log("!top5Lists.length");
+      return res
+        .status(404)
+        .json({ success: false, error: "Top 5 Lists not found" });
+    } else {
+      // PUT ALL THE LISTS INTO ID, NAME PAIRS
+
+      let pairs = [];
+      for (let key in top5Lists) {
+        let list = top5Lists[key];
+        // console.log("list:", list);
+
+        let pair = {
+          _id: list._id,
+          name: list.name,
+          stats: {
+            like: list.stats.like.length,
+            dislike: list.stats.dislike.length,
+            views: list.stats.views,
+          },
+          items: list.items,
+          ownerEmail: list.ownerEmail,
+          firstName: list.firstName,
+          lastName: list.lastName,
+          comments: list.comments,
+          published: list.published,
+          createdAt: list.createdAt,
+        };
+        pairs.push(pair);
+      }
+      return res.status(200).json({ success: true, idNamePairs: pairs });
+    }
+  }).catch((err) => console.log(err));
 };
 
 addComment = async (req, res) => {
@@ -221,39 +259,6 @@ addComment = async (req, res) => {
   });
 };
 
-removeLikeVote = async (req, res) => {
-  let { userEmail, listId } = req.body;
-  Top5List.findOne({ _id: listId }, (err, top5List) => {
-    let elementIndexLike = top5List.stats.like.indexOf(userEmail);
-    let elementIndexDislike = top5List.stats.dislike.indexOf(userEmail);
-    console.log("REMOVE LIKE:");
-    console.log("ElementIndexLike:", elementIndexLike);
-    console.log("ElementIndexDislike:", elementIndexDislike);
-
-    if (
-      (elementIndexDislike == -1 && elementIndexLike == -1) ||
-      (elementIndexDislike == -1 && elementIndexLike != -1)
-    ) {
-      top5List.stats.like.splice(elementIndexLike, 1);
-      top5List
-        .save()
-        .then(() => {
-          return res
-            .status(200)
-            .json({ success: true, error: "Removed Like Success" });
-        })
-        .catch(() => {
-          return res
-            .status(400)
-            .json({ success: false, error: "Error to Remove like" });
-        });
-    } else {
-      return res
-        .status(400)
-        .json({ success: false, error: "User didnot vote for like" });
-    }
-  });
-};
 addLikeVote = async (req, res) => {
   let { userEmail, listId } = req.body;
   Top5List.findOne({ _id: listId }, (err, top5List) => {
@@ -296,33 +301,97 @@ addDislikeVote = async (req, res) => {
 };
 removeDislikeVote = async (req, res) => {
   let { userEmail, listId } = req.body;
+  console.log("removing DISLIKE");
+  console.log(userEmail, listId);
+
   Top5List.findOne({ _id: listId }, (err, top5List) => {
     let elementIndexDislike = top5List.stats.dislike.indexOf(userEmail);
-    let elementIndexLike = top5List.stats.like.indexOf(userEmail);
+
     console.log("REMOVE DISLIKE:");
-    console.log("ElementIndexLike:", elementIndexLike);
     console.log("ElementIndexDislike:", elementIndexDislike);
-    if (
-      (elementIndexDislike == -1 && elementIndexLike == -1) ||
-      (elementIndexLike === -1 && elementIndexDislike !== -1)
-    ) {
-      top5List.stats.dislike.splice(elementIndexDislike, 1);
-      top5List
-        .save()
-        .then(() => {
-          return res
-            .status(200)
-            .json({ success: true, error: "Removed Dislike Success" });
-        })
-        .catch(() => {
-          return res
-            .status(400)
-            .json({ success: false, error: "Error to Remove dislike" });
-        });
-    } else {
+
+    // User didnot vote before
+    if (elementIndexDislike === -1) {
       return res
-        .status(400)
-        .json({ success: false, error: "User didnot vote for like" });
+        .status(200)
+        .json({ success: true, message: "User did not voted for dislike" });
+    } else {
+      top5List.stats.dislike = top5List.stats.dislike.filter(
+        (item) => item !== userEmail
+      );
+      top5List.save().then(() => {
+        return res
+          .status(200)
+          .json({ success: true, message: "Removed successfully" });
+      });
+    }
+  });
+};
+
+removeLikeVote = async (req, res) => {
+  let { userEmail, listId } = req.body;
+  console.log("removing Like");
+  console.log(userEmail, listId);
+
+  Top5List.findOne({ _id: listId }, (err, top5List) => {
+    let elementIndexLike = top5List.stats.like.indexOf(userEmail);
+
+    console.log("REMOVE LIKE:");
+    console.log("ElementIndexlike:", elementIndexLike);
+
+    // User didnot vote before
+    if (elementIndexLike === -1) {
+      return res
+        .status(200)
+        .json({ success: true, message: "User did not voted for Like" });
+    } else {
+      // top5List.stats.dislike.splice(elementIndexLike, 1);
+      top5List.stats.like = top5List.stats.like.filter(
+        (item) => item !== userEmail
+      );
+      top5List.save().then(() => {
+        return res
+          .status(200)
+          .json({ success: true, message: "Removed successfully" });
+      });
+    }
+  });
+};
+checkVoteDislike = async (req, res) => {
+  let { listId, userEmail } = req.body;
+  Top5List.findOne({ _id: listId }, (err, top5List) => {
+    let elementIndexDislike = top5List.stats.dislike.indexOf(userEmail);
+    if (elementIndexDislike === -1) {
+      return res.status(200).json({
+        success: true,
+        containsUser: false,
+        message: "User did not vote for Dislike",
+      });
+    } else {
+      return res.status(200).json({
+        success: true,
+        containsUser: true,
+        message: "User did  vote for Dislike",
+      });
+    }
+  });
+};
+checkVoteLike = async (req, res) => {
+  let { listId, userEmail } = req.body;
+  Top5List.findOne({ _id: listId }, (err, top5List) => {
+    let elementIndexLike = top5List.stats.like.indexOf(userEmail);
+    if (elementIndexLike === -1) {
+      return res.status(200).json({
+        success: true,
+        containsUser: false,
+        message: "User did not vote for Like",
+      });
+    } else {
+      return res.status(200).json({
+        success: true,
+        containsUser: true,
+        message: "User did  vote for Like",
+      });
     }
   });
 };
@@ -361,4 +430,7 @@ module.exports = {
   addDislikeVote,
   getAllPublishedLists,
   incrementView,
+
+  checkVoteLike,
+  checkVoteDislike,
 };

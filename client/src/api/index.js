@@ -59,6 +59,13 @@ export const addDislikeVote = (payload) => api.post("/addDislike/", payload);
 export const incrementViewListById = (payload) =>
   api.post("/incrementView/", payload);
 
+export const checkVoteLike = (payload) => api.post("/checkVoteLike", payload);
+export const checkVoteDislike = (payload) =>
+  api.post("/checkVoteDislike", payload);
+
+// router.post("/checkVoteLike".Top5ListController.checkVoteLike);
+// router.post("/checkVoteDislike".Top5ListController.checkVoteDislike);
+
 const apis = {
   createTop5List,
   // getAllTop5Lists,
@@ -73,10 +80,10 @@ const apis = {
   registerUser,
   loginUser,
   logoutUser,
-
+  checkVoteLike,
   removeLikeVote,
   removeDislikeVote,
-
+  checkVoteDislike,
   addLikeVote,
   addDislikeVote,
   incrementViewListById,

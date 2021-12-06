@@ -68,18 +68,20 @@ function GlobalStoreContextProvider(props) {
           isListNameEditActive: false,
           isItemEditActive: false,
           listMarkedForDeletion: null,
+          currentPage: 0,
           sortCode: store.sortCode,
         });
       }
       // GET ALL THE LISTS SO WE CAN PRESENT THEM
       case GlobalStoreActionType.LOAD_ID_NAME_PAIRS: {
         return setStore({
-          idNamePairs: payload,
+          idNamePairs: payload.lists,
           currentList: null,
           newListCounter: store.newListCounter,
           isListNameEditActive: false,
           isItemEditActive: false,
           listMarkedForDeletion: null,
+          currentPage: payload.currentPage,
           sortCode: store.sortCode,
         });
       }
@@ -156,6 +158,8 @@ function GlobalStoreContextProvider(props) {
           isListNameEditActive: false,
           isItemEditActive: false,
           listMarkedForDeletion: null,
+          currentPage: store.currentPage,
+
           sortCode: payload.sortCode,
         });
       }
@@ -167,6 +171,8 @@ function GlobalStoreContextProvider(props) {
           isListNameEditActive: false,
           isItemEditActive: false,
           listMarkedForDeletion: null,
+          currentPage: store.currentPage,
+
           sortCode: -1,
         });
       }
@@ -264,20 +270,31 @@ function GlobalStoreContextProvider(props) {
   };
 
   // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
-  store.loadIdNamePairs = async function () {
-    let payload = {
-      ownerEmail: auth.user.email,
-    };
-    const response = await api.getUserAllTop5List(payload);
-    if (response.data.success) {
-      let pairsArray = response.data.idNamePairs;
-      storeReducer({
-        type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
-        payload: pairsArray,
-      });
+  store.loadIdNamePairs = async function (list = null) {
+    let pairsArray;
+    let currentPage = store.checkCurrentPage();
+    if (!list) {
+      let payload = {
+        ownerEmail: auth.user.email,
+      };
+      const response = await api.getUserAllTop5List(payload);
+      if (response.data.success) {
+        pairsArray = response.data.idNamePairs;
+
+        storeReducer({
+          type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+          payload: { lists: pairsArray, currentPage: currentPage },
+        });
+      } else {
+        console.log("API FAILED TO GET THE LIST PAIRS");
+      }
     } else {
-      console.log("API FAILED TO GET THE LIST PAIRS");
+      pairsArray = list;
     }
+    storeReducer({
+      type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+      payload: { lists: pairsArray, currentPage: currentPage },
+    });
   };
 
   store.getListCounter = function () {
@@ -301,45 +318,55 @@ function GlobalStoreContextProvider(props) {
     };
     console.log("payload:", payload);
     let response = await api.addComment(payload);
-    // let comment = {
-    //   firstName: response.data.firstName,
-    //   lastName: response.data.lastName,
-    //   message: response.data.message,
-    // };
-    payload = {
-      ownerEmail: auth.user.email,
-    };
-    response = await api.getUserAllTop5List(payload);
-    if (response.data.success) {
-      let pairsArray = response.data.idNamePairs;
-      storeReducer({
-        type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
-        payload: pairsArray,
-      });
+    if (response.data.success && store.currentPage > 0) {
+      store.loadAllPublishedList();
     } else {
-      console.log("API FAILED TO GET THE LIST PAIRS");
+      payload = {
+        ownerEmail: auth.user.email,
+      };
+      response = await api.getUserAllTop5List(payload);
+      if (response.data.success) {
+        let pairsArray = response.data.idNamePairs;
+        let currentPage = store.checkCurrentPage();
+        storeReducer({
+          type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+          payload: { lists: pairsArray, currentPage: currentPage },
+        });
+      } else {
+        console.log("API FAILED TO GET THE LIST PAIRS");
+      }
     }
   };
 
   store.upVote = async function (listId) {
     try {
       let payload = {
-        ownerEmail: auth.user.email,
+        userEmail: auth.user.email,
+        listId: listId,
       };
       let email = auth.user.email;
-      let response = await api.getTop5ListById(listId, payload);
+
+      // Check if the user already voted for like;
+      let response = await api.checkVoteLike(payload);
+      if (response.data.success && response.data.containsUser) {
+        console.log("USER ALREADY VOTED");
+        return false;
+      }
+
+      response = await api.removeDislikeVote(payload);
+      if (response.data.success) {
+        response = await api.addLikeVote(payload);
+      }
+      payload = { ownerEmail: auth.user.email, listId: listId };
+      response = await api.getTop5ListById(listId, payload);
       if (response.data.success) {
         payload = {
           userEmail: email,
           listId: listId,
         };
-
-        // Check if the can vote up
-
-        response = await api.removeDislikeVote(payload);
-        // Add the vote on list
-        if (response.data.success) {
-          response = await api.addLikeVote(payload);
+        if (store.checkCurrentPage() > 0) {
+          store.loadAllPublishedList();
+        } else {
           store.loadIdNamePairs();
         }
       }
@@ -351,20 +378,31 @@ function GlobalStoreContextProvider(props) {
   store.downVote = async function (listId) {
     try {
       let payload = {
-        ownerEmail: auth.user.email,
+        userEmail: auth.user.email,
+        listId: listId,
       };
       let email = auth.user.email;
-      let response = await api.getTop5ListById(listId, payload);
+
+      // Check if the user already voted for dislike;
+      let response = await api.checkVoteDislike(payload);
+      if (response.data.success && response.data.containsUser) {
+        console.log("USER ALREADY VOTED");
+        return false;
+      }
+      response = await api.removeLikeVote(payload);
+      if (response.data.success) {
+        response = await api.addDislikeVote(payload);
+      }
+      payload = { ownerEmail: auth.user.email, listId: listId };
+      response = await api.getTop5ListById(listId, payload);
       if (response.data.success) {
         payload = {
           userEmail: email,
           listId: listId,
         };
-        response = await api.removeLikeVote(payload);
-        console.log(response);
-        // Add the vote on list
-        if (response.data.success) {
-          response = await api.addDislikeVote(payload);
+        if (store.checkCurrentPage() > 0) {
+          store.loadAllPublishedList();
+        } else {
           store.loadIdNamePairs();
         }
       }
@@ -381,6 +419,8 @@ function GlobalStoreContextProvider(props) {
       if (response.data.success) {
         if (store.sortCode != -1) {
           store.sortCurrentListLoaded();
+        } else if (store.currentPage > 0) {
+          store.loadAllPublishedList();
         } else {
           store.loadIdNamePairs();
         }
@@ -393,30 +433,15 @@ function GlobalStoreContextProvider(props) {
     let location = history.location.pathname;
 
     if (location === "/") {
-      storeReducer({
-        type: GlobalStoreActionType.SET_CURRENTPAGE_HOME,
-        payload: 0,
-      });
+      return 0;
     } else if (location === "/all" || location === "/all/") {
-      storeReducer({
-        type: GlobalStoreActionType.SET_CURRENTPAGE_HOME,
-        payload: 1,
-      });
+      return 1;
     } else if (location === "/all" || location === "/all/") {
-      storeReducer({
-        type: GlobalStoreActionType.SET_CURRENTPAGE_HOME,
-        payload: 1,
-      });
+      return 2;
     } else if (location === "/user" || location === "/user/") {
-      storeReducer({
-        type: GlobalStoreActionType.SET_CURRENTPAGE_HOME,
-        payload: 2,
-      });
+      return 3;
     } else if (location === "/community" || location === "/community/") {
-      storeReducer({
-        type: GlobalStoreActionType.SET_CURRENTPAGE_HOME,
-        payload: 3,
-      });
+      return 4;
     }
   };
 
@@ -598,15 +623,12 @@ function GlobalStoreContextProvider(props) {
   // ALL list
   store.loadAllPublishedList = async function () {
     const response = await api.loadAllPublishedList();
-    // if (response.data.success) {
-    //   let pairsArray = response.data.idNamePairs;
-    //   storeReducer({
-    //     type: GlobalStoreActionType.LOAD_HOMEPAGE_LIST,
-    //     payload: pairsArray,
-    //   });
-    // } else {
-    //   console.log("API FAILED TO GET ALL THE PUBLIC LISTS");
-    // }
+    if (response.data.success) {
+      let pairsArray = response.data.idNamePairs;
+      store.loadIdNamePairs(pairsArray);
+    } else {
+      console.log("API FAILED TO GET THE LIST PAIRS");
+    }
   };
   // ******************************************************************************/
   return (
