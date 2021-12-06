@@ -12,6 +12,7 @@ import LoginScreen from "./LoginScreen";
 import CommunityScreen from "./Community/CommunityScreen";
 import MenuBar from "./MenuBar/MenuBar";
 import AllListScreen from "./AllListScreen";
+import UserScreen from "./UserScreen";
 /*
     This serves as a module so that we can import
     all the other components as we wish.
@@ -33,4 +34,5 @@ export {
   CommunityScreen,
   MenuBar,
   AllListScreen, // all LISTs
+  UserScreen,
 };
