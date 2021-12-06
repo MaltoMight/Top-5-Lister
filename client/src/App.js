@@ -38,7 +38,7 @@ const App = () => {
             <Route path="/" exact component={HomeWrapper} />
             <Route path="/all" exact component={AllListScreen} />
             <Route path="/register/" exact component={RegisterScreen} />
-            <Route path="/user/:id" exact component={UserScreen} />
+            <Route path="/user/" exact component={UserScreen} />
             <Route path="/top5list/:id" exact component={WorkspaceScreen} />
             <Route path="/login/" exact component={LoginScreen} />
             <Route path="/community" exact component={CommunityScreen} />

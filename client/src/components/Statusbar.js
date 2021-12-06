@@ -7,6 +7,10 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { GlobalStoreContext } from "../store";
 
 export default function StatusBar() {
+  function useQuery() {
+    return new URLSearchParams(window.location.search);
+  }
+  let query = useQuery();
   const { store } = useContext(GlobalStoreContext);
 
   const { auth } = useContext(AuthContext);
@@ -51,9 +55,14 @@ export default function StatusBar() {
           </>
         );
       } else if (path === "user") {
+        let userString = "User's Lists";
+        if (query.get("username") !== null && query.get("username") !== "") {
+          userString = query.get("username") + " Lists";
+        }
+        // console.log("location:", query.get("username"));
         return (
           <>
-            <Typography variant="h4">User's Lists</Typography>
+            <Typography variant="h4">{userString}</Typography>
           </>
         );
       } else if (path === "community") {

@@ -35,5 +35,6 @@ router.post("/addDislike", Top5ListController.addDislikeVote);
 router.post("/incrementView", Top5ListController.incrementView);
 router.post("/checkVoteLike", Top5ListController.checkVoteLike);
 router.post("/checkVoteDislike", Top5ListController.checkVoteDislike);
+router.post("/allUserLists", Top5ListController.getAllUserPublishedLists);
 
 module.exports = router;

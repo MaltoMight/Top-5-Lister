@@ -1,19 +1,28 @@
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, React } from "react";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 import ListCard from "./ListCard.js";
 import List from "@mui/material/List";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation, useMemo } from "react-router-dom";
 
 export default function UserScreen() {
+  function useQuery() {
+    return new URLSearchParams(window.location.search);
+  }
+
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const history = useHistory();
+  let query = useQuery();
 
   useEffect(() => {
     console.log(history.location);
-    console.log("kekw");
-    // store.loadAllUserList();
+    let username = query.get("username");
+    if (username) {
+      store.loadAllUserList(username);
+    } else {
+      store.clearAllList();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -35,7 +44,6 @@ export default function UserScreen() {
   }
   return (
     <div id="top5-list-selector">
-      QWDQWDQWDQ
       <div id="list-selector-heading"></div>
       <div id="list-selector-list">{listCard}</div>
     </div>

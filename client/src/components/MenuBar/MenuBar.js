@@ -15,6 +15,7 @@ import PersonIcon from "@mui/icons-material/PersonOutlined";
 import FunctionsIcon from "@mui/icons-material/FunctionsOutlined";
 import SortIcon from "@mui/icons-material/SortOutlined";
 import TextField from "@mui/material/TextField";
+import { useHistory } from "react-router-dom";
 
 const theme = createTheme({
   palette: {
@@ -42,7 +43,10 @@ const useStyles = makeStyles((theme) => ({
     background: "rgb(232, 241, 250)",
   },
 }));
+
 export default function MenuBar() {
+  const history = useHistory();
+
   const location = useLocation();
   const { auth } = useContext(AuthContext);
   const classes = useStyles();
@@ -73,7 +77,17 @@ export default function MenuBar() {
       return "non-selectedIcon";
     }
   }
-
+  const handleSearchBar = function (event) {
+    // let path = history.location.pathname;
+    if (event.key === "Enter") {
+      if (store.currentPage === 2) {
+        // console.log(event.target.value);
+        let redirect = "/user?username=" + event.target.value;
+        history.push(redirect);
+        history.go();
+      }
+    }
+  };
   function colorManager() {
     if (location.pathname.includes("top5list")) {
       return "disabled";
@@ -180,6 +194,7 @@ export default function MenuBar() {
                     disabled={clickable}
                     style={{ width: "60%" }}
                     label="Search"
+                    onKeyPress={handleSearchBar}
                     InputProps={{ className: classes.input }}
                   />
                 </Grid>

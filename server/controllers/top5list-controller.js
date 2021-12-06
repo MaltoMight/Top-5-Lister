@@ -135,6 +135,54 @@ createTop5List = (req, res) => {
     });
 };
 
+///////////////////////////////////////////////////////////////////////////////
+getAllUserPublishedLists = async (req, res) => {
+  console.log(req.body);
+  let { ownerEmail } = req.body;
+  console.log(ownerEmail);
+  await Top5List.find({ ownerEmail: ownerEmail }, (err, top5Lists) => {
+    // console.log("top55555555list:", top5Lists);
+    if (err) {
+      return res.status(400).json({ success: false, error: err });
+    }
+    if (!top5Lists) {
+      console.log("!top5Lists.length");
+      return res
+        .status(404)
+        .json({ success: false, error: "Top 5 Lists not found" });
+    } else {
+      // PUT ALL THE LISTS INTO ID, NAME PAIRS
+
+      let pairs = [];
+      let publishedLists = top5Lists.filter((item) => {
+        return item.published === true;
+      });
+
+      for (let key in publishedLists) {
+        let list = publishedLists[key];
+
+        let pair = {
+          _id: list._id,
+          name: list.name,
+          stats: {
+            like: list.stats.like.length,
+            dislike: list.stats.dislike.length,
+            views: list.stats.views,
+          },
+          items: list.items,
+          ownerEmail: list.ownerEmail,
+          firstName: list.firstName,
+          lastName: list.lastName,
+          comments: list.comments,
+          published: list.published,
+          createdAt: list.createdAt,
+        };
+        pairs.push(pair);
+      }
+      return res.status(200).json({ success: true, idNamePairs: pairs });
+    }
+  }).catch((err) => console.log(err));
+};
 getUserAllTop5List = async (req, res) => {
   let { ownerEmail } = req.query;
   console.log(ownerEmail);
@@ -432,5 +480,6 @@ module.exports = {
   incrementView,
 
   checkVoteLike,
+  getAllUserPublishedLists,
   checkVoteDislike,
 };

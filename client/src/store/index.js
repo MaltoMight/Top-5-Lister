@@ -30,6 +30,7 @@ export const GlobalStoreActionType = {
   CLOSE_ITEM_EDIT_ACTIVE: "CLOSE_ITEM_EDIT_ACTIVE",
   LOAD_SORTED_LIST: "LOAD_SORTED_LIST",
   LOAD_HOMEPAGE_LIST: "LOAD_HOMEPAGE_LIST",
+  CLEAR_ALL_LIST: "CLEAR_ALL_LIST",
 };
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -172,8 +173,19 @@ function GlobalStoreContextProvider(props) {
           isItemEditActive: false,
           listMarkedForDeletion: null,
           currentPage: store.currentPage,
-
           sortCode: -1,
+        });
+      }
+      case GlobalStoreActionType.CLEAR_ALL_LIST: {
+        return setStore({
+          idNamePairs: [],
+          currentList: null,
+          newListCounter: store.newListCounter,
+          isListNameEditActive: false,
+          isItemEditActive: false,
+          listMarkedForDeletion: null,
+          currentPage: store.currentPage,
+          sortCode: store.sortCode,
         });
       }
 
@@ -318,8 +330,14 @@ function GlobalStoreContextProvider(props) {
     };
     console.log("payload:", payload);
     let response = await api.addComment(payload);
-    if (response.data.success && store.currentPage > 0) {
+    if (response.data.success && store.currentPage === 1) {
       store.loadAllPublishedList();
+    } else if (response.data.success && store.currentPage === 2) {
+      function usingQuery() {
+        return new URLSearchParams(window.location.search);
+      }
+      let query = usingQuery();
+      store.loadAllUserList(query.get("username"));
     } else {
       payload = {
         ownerEmail: auth.user.email,
@@ -357,10 +375,18 @@ function GlobalStoreContextProvider(props) {
       if (response.data.success) {
         response = await api.addLikeVote(payload);
       }
-      if (store.checkCurrentPage() > 0) {
+      if (store.checkCurrentPage() === 1) {
         store.loadAllPublishedList();
         return true;
+      } else if (store.checkCurrentPage() === 2) {
+        function usingQuery() {
+          return new URLSearchParams(window.location.search);
+        }
+        let query = usingQuery();
+        store.loadAllUserList(query.get("username"));
+        return true;
       }
+
       payload = { ownerEmail: auth.user.email, listId: listId };
       response = await api.getTop5ListById(listId, payload);
       if (response.data.success) {
@@ -397,8 +423,15 @@ function GlobalStoreContextProvider(props) {
       if (response.data.success) {
         response = await api.addDislikeVote(payload);
       }
-      if (store.checkCurrentPage() > 0) {
+      if (store.checkCurrentPage() === 1) {
         store.loadAllPublishedList();
+        return true;
+      } else if (store.checkCurrentPage() === 2) {
+        function usingQuery() {
+          return new URLSearchParams(window.location.search);
+        }
+        let query = usingQuery();
+        store.loadAllUserList(query.get("username"));
         return true;
       }
       payload = { ownerEmail: auth.user.email, listId: listId };
@@ -408,7 +441,7 @@ function GlobalStoreContextProvider(props) {
           userEmail: email,
           listId: listId,
         };
-        if (store.checkCurrentPage() > 0) {
+        if (store.checkCurrentPage() === 1) {
           store.loadAllPublishedList();
         } else {
           store.loadIdNamePairs();
@@ -427,8 +460,14 @@ function GlobalStoreContextProvider(props) {
       if (response.data.success) {
         if (store.sortCode != -1) {
           store.sortCurrentListLoaded();
-        } else if (store.currentPage > 0) {
+        } else if (store.currentPage === 1) {
           store.loadAllPublishedList();
+        } else if (store.currentPage === 2) {
+          function usingQuery() {
+            return new URLSearchParams(window.location.search);
+          }
+          let query = usingQuery();
+          store.loadAllUserList(query.get("username"));
         } else {
           store.loadIdNamePairs();
         }
@@ -444,12 +483,10 @@ function GlobalStoreContextProvider(props) {
       return 0;
     } else if (location === "/all" || location === "/all/") {
       return 1;
-    } else if (location === "/all" || location === "/all/") {
-      return 2;
     } else if (location === "/user" || location === "/user/") {
-      return 3;
+      return 2;
     } else if (location === "/community" || location === "/community/") {
-      return 4;
+      return 3;
     }
   };
 
@@ -640,14 +677,21 @@ function GlobalStoreContextProvider(props) {
   };
 
   //USER LISTS
-  store.loadAllUserList = async function () {
-    // const response = await api.loadAllPublishedList();
-    // if (response.data.success) {
-    //   let pairsArray = response.data.idNamePairs;
-    //   store.loadIdNamePairs(pairsArray);
-    // } else {
-    //   console.log("API FAILED TO GET THE LIST PAIRS");
-    // }
+  store.loadAllUserList = async function (userName) {
+    let payload = { ownerEmail: userName };
+    const response = await api.loadAllUserPublishedList(payload);
+    if (response.data.success) {
+      let pairsArray = response.data.idNamePairs;
+      store.loadIdNamePairs(pairsArray);
+    } else {
+      console.log("API FAILED TO GET THE LIST PAIRS");
+    }
+  };
+  store.clearAllList = async function () {
+    storeReducer({
+      type: GlobalStoreActionType.CLEAR_ALL_LIST,
+      payload: {},
+    });
   };
   // ******************************************************************************/
   return (
