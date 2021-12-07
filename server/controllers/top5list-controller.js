@@ -650,6 +650,7 @@ incrementView = async (req, res) => {
 
 updateCommunityList = async (req, res) => {
   // console.log("community:", req.body);
+  console.log("community:", req.body);
   let titleList = req.body.name;
   CommunityList.findOne(
     { name: { $regex: new RegExp(titleList, "i") } },
@@ -700,6 +701,8 @@ updateCommunityList = async (req, res) => {
         console.log("itemsExisted:", itemsExisted);
         console.log("itemsToAppend:", itemsToAppend);
         let lengthToSearch = 5;
+        let listLeft = itemsToAppend;
+        let votesLeft = votesToAppend;
         for (let i = 0; i < lengthToSearch; i++) {
           for (let j = 0; j < itemsExisted.length; j++) {
             let a = itemsToAppend[i];
@@ -710,21 +713,22 @@ updateCommunityList = async (req, res) => {
               // console.log(itemsExisted[j].vote);
 
               itemsExisted[j].vote += votesToAppend[i];
-              itemsToAppend = itemsToAppend.filter(
+              listLeft = listLeft.filter(
                 (item) => item.toLowerCase() !== itemsToAppend[i].toLowerCase()
               );
-              votesToAppend = votesToAppend.filter(
-                (item) => item !== votesToAppend[i]
-              );
-              lengthToSearch--;
+              votesLeft = votesLeft.filter((item) => item !== votesToAppend[i]);
+              console.log(listLeft);
+              // lengthToSearch--;
             }
           }
         }
-        if (itemsToAppend.length !== 0) {
-          for (let i = 0; i < itemsToAppend.length; i++) {
+        // console.log("listLeft:", listLeft);
+        // console.log(itemsExisted);
+        if (listLeft.length !== 0) {
+          for (let i = 0; i < listLeft.length; i++) {
             itemsExisted.push({
-              itemName: itemsToAppend[i],
-              vote: votesToAppend[i],
+              itemName: listLeft[i],
+              vote: votesLeft[i],
             });
           }
         }

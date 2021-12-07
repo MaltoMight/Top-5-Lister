@@ -3,7 +3,7 @@ import * as React from "react";
 import { Typography, Box, Grid, IconButton } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import AuthContext from "../../auth";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { Link } from "react-router-dom";
 import { GlobalStoreContext } from "../../store/index.js";
@@ -16,6 +16,9 @@ import FunctionsIcon from "@mui/icons-material/FunctionsOutlined";
 import SortIcon from "@mui/icons-material/SortOutlined";
 import TextField from "@mui/material/TextField";
 import { useHistory } from "react-router-dom";
+
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
 
 const theme = createTheme({
   palette: {
@@ -52,13 +55,31 @@ export default function MenuBar() {
   const classes = useStyles();
   const { store } = useContext(GlobalStoreContext);
 
+  //***********************************************************************************************************
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const isMenuOpen = Boolean(anchorEl);
+
   let homeIconText = "disabled";
   if (auth.loggedIn) {
     homeIconText = "enabled";
   }
-  function handleSort() {
-    store.sortListByLike();
+
+  // ***********************************************************************************************************8
+  function handleSort(options) {
+    if (options === 1) {
+      store.sortListByNewestDate();
+    } else if (options === 2) {
+      store.sortListByOldestDate();
+    } else if (options === 3) {
+      store.sortListByViews();
+    } else if (options === 4) {
+      store.sortListByLike();
+    } else if (options === 5) {
+      store.sortListByDislike();
+    }
   }
+
   function iconClassName(number) {
     let check = location.pathname.replace("/", "");
 
@@ -77,6 +98,32 @@ export default function MenuBar() {
       return "non-selectedIcon";
     }
   }
+
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+  const menuId = "primary-search-account-menu";
+  const menuOpened = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+    ></Menu>
+  );
+
   const handleSearchBar = function (event) {
     let path = history.location.pathname;
     if (event.key === "Enter") {
@@ -145,7 +192,60 @@ export default function MenuBar() {
     } else {
       homeIcon = <HomeIcon color={homeIconText} style={{ fontSize: "30pt" }} />;
     }
-
+    const sortOptionsMenu = (
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        id={menuId}
+        keepMounted
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        open={isMenuOpen}
+        onClose={handleMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            handleSort(1);
+          }}
+        >
+          Publish Date (Newest)
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleSort(2);
+          }}
+        >
+          Publish Date (Oldest)
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleSort(3);
+          }}
+        >
+          Views
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleSort(4);
+          }}
+        >
+          Likes
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleSort(5);
+          }}
+        >
+          Dislikes
+        </MenuItem>
+      </Menu>
+    );
+    let sortMenu = sortOptionsMenu;
     if (valid) {
       menuBar = (
         <div className="top5-menuBar">
@@ -206,11 +306,12 @@ export default function MenuBar() {
                     <SortIcon
                       color={colorManager()}
                       style={{ fontSize: "30pt" }}
-                      onClick={handleSort}
+                      onClick={handleProfileMenuOpen}
                     />
                   </IconButton>
                 </Grid>
               </Grid>
+              {sortMenu}
             </Box>
           </ThemeProvider>
         </div>

@@ -592,6 +592,7 @@ function GlobalStoreContextProvider(props) {
   // dELETEs after user's confirmation
   store.deleteList = async function (idList) {
     let response = await api.deleteTop5ListById(idList);
+
     if (response.data.success) {
       store.loadIdNamePairs();
       history.push("/");
