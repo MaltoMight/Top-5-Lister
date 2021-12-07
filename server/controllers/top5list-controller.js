@@ -1,4 +1,5 @@
 const Top5List = require("../models/top5list-model");
+const CommunityList = require("../models/community-model");
 const mongoose = require("mongoose");
 
 // const LIKE = 0;
@@ -445,22 +446,183 @@ checkVoteLike = async (req, res) => {
 };
 
 incrementView = async (req, res) => {
-  let { listId } = req.body;
-  Top5List.findOne({ _id: listId }, (err, top5List) => {
-    top5List.stats.views++;
-    top5List
-      .save()
-      .then(() => {
-        return res
-          .status(200)
-          .json({ success: true, message: "Incremented View" });
-      })
-      .catch(() => {
-        return res
-          .status(400)
-          .json({ success: false, error: "Error to increment the view" });
-      });
-  });
+  let { listId, communityList } = req.body;
+  if (!communityList) {
+    Top5List.findOne({ _id: listId }, (err, top5List) => {
+      top5List.stats.views++;
+      top5List
+        .save()
+        .then(() => {
+          return res
+            .status(200)
+            .json({ success: true, message: "Incremented View" });
+        })
+        .catch(() => {
+          return res
+            .status(400)
+            .json({ success: false, error: "Error to increment the view" });
+        });
+    });
+  } else {
+    CommunityList.findOne({ _id: listId }, (err, top5List) => {
+      top5List.stats.views++;
+      top5List
+        .save()
+        .then(() => {
+          return res
+            .status(200)
+            .json({ success: true, message: "Incremented View" });
+        })
+        .catch(() => {
+          return res
+            .status(400)
+            .json({ success: false, error: "Error to increment the view" });
+        });
+    });
+  }
+};
+
+updateCommunityList = async (req, res) => {
+  // console.log("community:", req.body);
+  let titleList = req.body.name;
+  CommunityList.findOne(
+    { name: { $regex: new RegExp(titleList, "i") } },
+    (err, communityList) => {
+      // If community list does not exists
+      if (communityList === null) {
+        let body = {
+          name: req.body.name,
+          items: [
+            { itemName: req.body.items[0], vote: 5 },
+            { itemName: req.body.items[1], vote: 4 },
+            { itemName: req.body.items[2], vote: 3 },
+            { itemName: req.body.items[3], vote: 2 },
+            { itemName: req.body.items[4], vote: 1 },
+          ],
+
+          stats: req.body.stats,
+          published: true,
+          comments: req.body.comments,
+        };
+        const newCommunityList = new CommunityList(body);
+        if (!newCommunityList) {
+          return res.status(400).json({ success: false, error: err });
+        }
+        newCommunityList
+          .save()
+          .then(() => {
+            return res.status(200).json({
+              success: true,
+              communityList: newCommunityList,
+              message: "Community List Created!",
+            });
+          })
+          .catch((error) => {
+            return res.status(400).json({
+              error,
+              message: "Community List Not Created!",
+            });
+          });
+      }
+      // If community list already exist
+      else {
+        // Check if the items to append exists in to the community List
+
+        let itemsExisted = communityList.items;
+        let itemsToAppend = req.body.items;
+        let votesToAppend = [5, 4, 3, 2, 1];
+        console.log("itemsExisted:", itemsExisted);
+        console.log("itemsToAppend:", itemsToAppend);
+        let lengthToSearch = 5;
+        for (let i = 0; i < lengthToSearch; i++) {
+          for (let j = 0; j < itemsExisted.length; j++) {
+            let a = itemsToAppend[i];
+            a = a.toLowerCase();
+            let b = itemsExisted[j].itemName.toLowerCase();
+
+            if (a === b) {
+              // console.log(itemsExisted[j].vote);
+
+              itemsExisted[j].vote += votesToAppend[i];
+              itemsToAppend = itemsToAppend.filter(
+                (item) => item.toLowerCase() !== itemsToAppend[i].toLowerCase()
+              );
+              votesToAppend = votesToAppend.filter(
+                (item) => item !== votesToAppend[i]
+              );
+              lengthToSearch--;
+            }
+          }
+        }
+        if (itemsToAppend.length !== 0) {
+          for (let i = 0; i < itemsToAppend.length; i++) {
+            itemsExisted.push({
+              itemName: itemsToAppend[i],
+              vote: votesToAppend[i],
+            });
+          }
+        }
+
+        console.log("RESULT");
+        communityList.items = itemsExisted;
+        console.log(communityList);
+
+        communityList.markModified("items");
+        communityList
+          .save()
+          .then(() => {
+            return res.status(200).json({
+              success: true,
+              communityList: communityList,
+              message: "Community List Created!",
+            });
+          })
+          .catch((error) => {
+            return res.status(400).json({
+              error,
+              message: "Community List Not Created!",
+            });
+          });
+      }
+    }
+  );
+};
+getCommunityList = async (req, res) => {
+  console.log("retrieving all the COMMUNITY lists");
+  await CommunityList.find({}, (err, top5Lists) => {
+    if (err) {
+      return res.status(400).json({ success: false, error: err });
+    }
+    if (!top5Lists) {
+      return res
+        .status(404)
+        .json({ success: false, error: "CommunityList not found" });
+    } else {
+      // PUT ALL THE LISTS INTO ID, NAME PAIRS
+
+      let pairs = [];
+      for (let key in top5Lists) {
+        let list = top5Lists[key];
+
+        let pair = {
+          _id: list._id,
+          name: list.name,
+          stats: {
+            like: list.stats.like.length,
+            dislike: list.stats.dislike.length,
+            views: list.stats.views,
+          },
+          items: list.items,
+
+          comments: list.comments,
+          published: list.published,
+          createdAt: list.createdAt,
+        };
+        pairs.push(pair);
+      }
+      return res.status(200).json({ success: true, idNamePairs: pairs });
+    }
+  }).catch((err) => console.log(err));
 };
 module.exports = {
   createTop5List,
@@ -482,4 +644,6 @@ module.exports = {
   checkVoteLike,
   getAllUserPublishedLists,
   checkVoteDislike,
+  updateCommunityList,
+  getCommunityList,
 };

@@ -31,6 +31,7 @@ export const GlobalStoreActionType = {
   LOAD_SORTED_LIST: "LOAD_SORTED_LIST",
   LOAD_HOMEPAGE_LIST: "LOAD_HOMEPAGE_LIST",
   CLEAR_ALL_LIST: "CLEAR_ALL_LIST",
+  LOAD_COMMUNITY_LIST: "LOAD_COMMUNITY_LIST",
 };
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -49,6 +50,7 @@ function GlobalStoreContextProvider(props) {
     listMarkedForDeletion: null,
     currentPage: 0, // 0 -> home page , 1 -> all list page, 2 -> user list, 3 -> communitylist page
     sortCode: -1,
+    communityList: false,
   });
   const history = useHistory();
 
@@ -71,6 +73,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
           currentPage: 0,
           sortCode: store.sortCode,
+          communityList: store.communityList,
         });
       }
       // GET ALL THE LISTS SO WE CAN PRESENT THEM
@@ -84,6 +87,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
           currentPage: payload.currentPage,
           sortCode: store.sortCode,
+          communityList: store.communityList,
         });
       }
 
@@ -101,6 +105,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: store.listMarkedForDeletion,
           currentPage: payload,
           sortCode: -1,
+          communityList: store.communityList,
         });
       }
       case GlobalStoreActionType.SET_CURRENT_LIST: {
@@ -113,6 +118,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
           currentPage: store.currentPage,
           sortCode: store.sortCode,
+          communityList: store.communityList,
         });
       }
       case GlobalStoreActionType.CLOSE_CURRENT_LIST: {
@@ -125,6 +131,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
           currentPage: store.currentPage,
           sortCode: store.sortCode,
+          communityList: store.communityList,
         });
       }
       case GlobalStoreActionType.MARK_LIST_FOR_DELETION: {
@@ -137,6 +144,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: payload,
           currentPage: store.currentPage,
           sortCode: store.sortCode,
+          communityList: store.communityList,
         });
       }
       case GlobalStoreActionType.UNMARK_LIST_FOR_DELETION: {
@@ -149,6 +157,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
           currentPage: store.currentPage,
           sortCode: store.sortCode,
+          communityList: store.communityList,
         });
       }
       case GlobalStoreActionType.LOAD_SORTED_LIST: {
@@ -162,6 +171,7 @@ function GlobalStoreContextProvider(props) {
           currentPage: store.currentPage,
 
           sortCode: payload.sortCode,
+          communityList: store.communityList,
         });
       }
       case GlobalStoreActionType.LOAD_HOMEPAGE_LIST: {
@@ -174,6 +184,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
           currentPage: store.currentPage,
           sortCode: -1,
+          communityList: store.communityList,
         });
       }
       case GlobalStoreActionType.CLEAR_ALL_LIST: {
@@ -186,6 +197,20 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
           currentPage: store.currentPage,
           sortCode: store.sortCode,
+          communityList: store.communityList,
+        });
+      }
+      case GlobalStoreActionType.LOAD_COMMUNITY_LIST: {
+        return setStore({
+          idNamePairs: payload,
+          currentList: null,
+          newListCounter: store.newListCounter,
+          isListNameEditActive: false,
+          isItemEditActive: false,
+          listMarkedForDeletion: null,
+          currentPage: 3,
+          sortCode: store.sortCode,
+          communityList: true,
         });
       }
 
@@ -455,6 +480,7 @@ function GlobalStoreContextProvider(props) {
     try {
       let payload = {
         listId: listId,
+        communityList: store.communityList,
       };
       let response = await api.incrementViewListById(payload);
       if (response.data.success) {
@@ -468,6 +494,8 @@ function GlobalStoreContextProvider(props) {
           }
           let query = usingQuery();
           store.loadAllUserList(query.get("username"));
+        } else if (store.currentPage === 3) {
+          store.loadCommunityList();
         } else {
           store.loadIdNamePairs();
         }
@@ -490,15 +518,25 @@ function GlobalStoreContextProvider(props) {
     }
   };
 
-  store.publishList = async function (listId) {
-    let payload = { ownerEmail: auth.user.email };
+  store.publishList = async function (listId, title) {
+    if (title === "") {
+      title = store.currentList.name;
+    }
+    store.currentList.name = title;
+    let response = await api.updateTop5ListById(
+      store.currentList._id,
+      store.currentList
+    );
 
-    let response = await api.getTop5ListById(listId, payload);
+    let payload = { ownerEmail: auth.user.email };
+    response = await api.getTop5ListById(listId, payload);
     if (response.data.success) {
       let top5List = response.data.top5List;
       top5List.published = true;
       response = await api.updateTop5ListById(top5List._id, top5List);
       if (response.data.success) {
+        response = await api.updateCommunityList(top5List);
+
         storeReducer({
           type: GlobalStoreActionType.SET_CURRENT_LIST,
           payload: top5List,
@@ -694,6 +732,16 @@ function GlobalStoreContextProvider(props) {
     });
   };
   // ******************************************************************************/
+  store.loadCommunityList = async function () {
+    let response = await api.getCommunityList();
+    if (response.data.success) {
+      let pairsArray = response.data.idNamePairs;
+      storeReducer({
+        type: GlobalStoreActionType.LOAD_COMMUNITY_LIST,
+        payload: pairsArray,
+      });
+    }
+  };
   return (
     <GlobalStoreContext.Provider
       value={{

@@ -78,9 +78,9 @@ export default function MenuBar() {
     }
   }
   const handleSearchBar = function (event) {
-    // let path = history.location.pathname;
+    let path = history.location.pathname;
     if (event.key === "Enter") {
-      if (store.currentPage === 2) {
+      if (path === "/user" || path === "/user/") {
         // console.log(event.target.value);
         let redirect = "/user?username=" + event.target.value;
         history.push(redirect);

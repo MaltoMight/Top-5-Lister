@@ -9,7 +9,7 @@ import StatusBar from "./StatusBar";
 import Top5Item from "./Top5Item";
 import WorkspaceScreen from "./WorkspaceScreen";
 import LoginScreen from "./LoginScreen";
-import CommunityScreen from "./Community/CommunityScreen";
+import CommunityScreen from "./CommunityScreen";
 import MenuBar from "./MenuBar/MenuBar";
 import AllListScreen from "./AllListScreen";
 import UserScreen from "./UserScreen";

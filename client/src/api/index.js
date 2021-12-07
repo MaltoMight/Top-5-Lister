@@ -64,12 +64,17 @@ export const checkVoteDislike = (payload) =>
   api.post("/checkVoteDislike", payload);
 export const loadAllUserPublishedList = (payload) =>
   api.post("/allUserLists", payload);
-// router.post("/checkVoteLike".Top5ListController.checkVoteLike);
-// router.post("/checkVoteDislike".Top5ListController.checkVoteDislike);
+
+///////////////////////////////////////////////////////////
+
+export const updateCommunityList = (payload) =>
+  api.post("/updateCommunityList/", payload);
+export const getCommunityList = () => api.get("/getCommunityList/");
+export const updateTitleList = (payload) =>
+  api.post("/updateTitleList/", payload);
 
 const apis = {
   createTop5List,
-  // getAllTop5Lists,
   getUserAllTop5List,
   updateTop5ListById,
   deleteTop5ListById,
@@ -89,6 +94,9 @@ const apis = {
   addLikeVote,
   addDislikeVote,
   incrementViewListById,
+  updateTitleList,
+  updateCommunityList,
+  getCommunityList,
 };
 
 export default apis;

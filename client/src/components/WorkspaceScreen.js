@@ -213,7 +213,7 @@ function WorkspaceScreen() {
               <Button onClick={handleSaveList}> Save</Button>
               <Button
                 onClick={() => {
-                  store.publishList(currentList._id);
+                  store.publishList(currentList._id, titleName);
                 }}
               >
                 Publish

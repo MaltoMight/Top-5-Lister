@@ -25,7 +25,6 @@ router.get(
   auth.verify,
   Top5ListController.getUserAllTop5List
 );
-
 // *************************** STATS ***********************
 
 router.post("/removeLike", Top5ListController.removeLikeVote);
@@ -37,4 +36,6 @@ router.post("/checkVoteLike", Top5ListController.checkVoteLike);
 router.post("/checkVoteDislike", Top5ListController.checkVoteDislike);
 router.post("/allUserLists", Top5ListController.getAllUserPublishedLists);
 
+router.post("/updateCommunityList", Top5ListController.updateCommunityList);
+router.get("/getCommunityList", Top5ListController.getCommunityList);
 module.exports = router;
