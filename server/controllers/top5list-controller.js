@@ -272,40 +272,75 @@ getAllPublishedLists = async (req, res) => {
 addComment = async (req, res) => {
   console.log("adding comment");
   // console.log("req:", req);
-  let { message, firstName, lastName } = req.body;
+  let { message, firstName, lastName, communityList } = req.body;
   console.log(message, firstName, lastName);
-  Top5List.findOne({ _id: req.body._id }, (err, top5List) => {
-    console.log(top5List);
-    top5List.comments.addToSet({
-      firstname: firstName,
-      lastName: lastName,
-      message: message,
-    });
-    console.log(top5List);
-    // top5List.save();
-    top5List
-      .save()
-      .then(() => {
-        console.log("SUCCESS!!!");
-        return res.status(200).json({
-          success: true,
-          comment: {
-            firstName: firstName,
-            lastName: lastName,
-            message: message,
-          },
-          id: top5List._id,
-          message: "Top 5 List updated!",
-        });
-      })
-      .catch((error) => {
-        console.log("FAILURE: " + JSON.stringify(error));
-        return res.status(404).json({
-          error,
-          message: "Top 5 List not updated!",
-        });
+  if (!communityList) {
+    Top5List.findOne({ _id: req.body._id }, (err, top5List) => {
+      console.log(top5List);
+      top5List.comments.addToSet({
+        firstname: firstName,
+        lastName: lastName,
+        message: message,
       });
-  });
+      console.log(top5List);
+      // top5List.save();
+      top5List
+        .save()
+        .then(() => {
+          console.log("SUCCESS!!!");
+          return res.status(200).json({
+            success: true,
+            comment: {
+              firstName: firstName,
+              lastName: lastName,
+              message: message,
+            },
+            id: top5List._id,
+            message: "Top 5 List updated!",
+          });
+        })
+        .catch((error) => {
+          console.log("FAILURE: " + JSON.stringify(error));
+          return res.status(404).json({
+            error,
+            message: "Top 5 List not updated!",
+          });
+        });
+    });
+  } else {
+    CommunityList.findOne({ _id: req.body._id }, (err, top5List) => {
+      console.log(top5List);
+      top5List.comments.addToSet({
+        firstname: firstName,
+        lastName: lastName,
+        message: message,
+      });
+      console.log(top5List);
+      // top5List.save();
+      top5List
+        .save()
+        .then(() => {
+          console.log("SUCCESS!!!");
+          return res.status(200).json({
+            success: true,
+            comment: {
+              firstName: firstName,
+              lastName: lastName,
+              message: message,
+            },
+            id: top5List._id,
+            message: "Top 5 List updated!",
+          });
+        })
+        .catch((error) => {
+          console.log("FAILURE: " + JSON.stringify(error));
+          return res.status(404).json({
+            error,
+            message: "Top 5 List not updated!",
+          });
+        });
+    });
+  }
 };
 
 addLikeVote = async (req, res) => {

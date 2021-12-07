@@ -87,7 +87,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
           currentPage: payload.currentPage,
           sortCode: store.sortCode,
-          communityList: store.communityList,
+          communityList: false,
         });
       }
 
@@ -184,7 +184,7 @@ function GlobalStoreContextProvider(props) {
           listMarkedForDeletion: null,
           currentPage: store.currentPage,
           sortCode: -1,
-          communityList: store.communityList,
+          communityList: false,
         });
       }
       case GlobalStoreActionType.CLEAR_ALL_LIST: {
@@ -352,17 +352,20 @@ function GlobalStoreContextProvider(props) {
       firstName: auth.user.firstName,
       lastName: auth.user.lastName,
       message: comments,
+      communityList: store.communityList,
     };
     console.log("payload:", payload);
     let response = await api.addComment(payload);
     if (response.data.success && store.currentPage === 1) {
       store.loadAllPublishedList();
-    } else if (response.data.success && store.currentPage === 2) {
+    } else if (store.currentPage === 2) {
       function usingQuery() {
         return new URLSearchParams(window.location.search);
       }
       let query = usingQuery();
       store.loadAllUserList(query.get("username"));
+    } else if (store.communityList) {
+      store.loadCommunityList();
     } else {
       payload = {
         ownerEmail: auth.user.email,
@@ -386,6 +389,7 @@ function GlobalStoreContextProvider(props) {
       let payload = {
         userEmail: auth.user.email,
         listId: listId,
+        communityList: store.communityList,
       };
       let email = auth.user.email;
 
@@ -410,6 +414,8 @@ function GlobalStoreContextProvider(props) {
         let query = usingQuery();
         store.loadAllUserList(query.get("username"));
         return true;
+      } else if (store.communityList) {
+        store.loadCommunityList();
       }
 
       payload = { ownerEmail: auth.user.email, listId: listId };
@@ -435,6 +441,7 @@ function GlobalStoreContextProvider(props) {
       let payload = {
         userEmail: auth.user.email,
         listId: listId,
+        communityList: store.communityList,
       };
       let email = auth.user.email;
 
@@ -458,6 +465,8 @@ function GlobalStoreContextProvider(props) {
         let query = usingQuery();
         store.loadAllUserList(query.get("username"));
         return true;
+      } else if (store.communityList) {
+        store.loadCommunityList();
       }
       payload = { ownerEmail: auth.user.email, listId: listId };
       response = await api.getTop5ListById(listId, payload);
@@ -482,23 +491,26 @@ function GlobalStoreContextProvider(props) {
         listId: listId,
         communityList: store.communityList,
       };
-      let response = await api.incrementViewListById(payload);
-      if (response.data.success) {
-        if (store.sortCode != -1) {
-          store.sortCurrentListLoaded();
-        } else if (store.currentPage === 1) {
-          store.loadAllPublishedList();
-        } else if (store.currentPage === 2) {
-          function usingQuery() {
-            return new URLSearchParams(window.location.search);
+      if (!store.communityList) {
+        let response = await api.incrementViewListById(payload);
+        if (response.data.success) {
+          if (store.sortCode != -1) {
+            store.sortCurrentListLoaded();
+          } else if (store.currentPage === 1) {
+            store.loadAllPublishedList();
+          } else if (store.currentPage === 2) {
+            function usingQuery() {
+              return new URLSearchParams(window.location.search);
+            }
+            let query = usingQuery();
+            store.loadAllUserList(query.get("username"));
+          } else {
+            store.loadIdNamePairs();
           }
-          let query = usingQuery();
-          store.loadAllUserList(query.get("username"));
-        } else if (store.currentPage === 3) {
-          store.loadCommunityList();
-        } else {
-          store.loadIdNamePairs();
         }
+      } else {
+        let response = await api.incrementViewListById(payload);
+        store.loadCommunityList();
       }
     } catch (error) {
       console.log("error");

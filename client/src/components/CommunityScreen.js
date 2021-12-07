@@ -1,7 +1,7 @@
 import { useEffect, useContext, React } from "react";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
-import ListCard from "./ListCard.js";
+import CommunityListCard from "./CommunityListCard.js";
 import List from "@mui/material/List";
 import { useHistory, useLocation, useMemo } from "react-router-dom";
 
@@ -28,7 +28,11 @@ export default function CommunityScreen() {
         }}
       >
         {store.idNamePairs.map((pair) => (
-          <ListCard key={pair._id} idNamePair={pair} selected={false} />
+          <CommunityListCard
+            key={pair._id}
+            idNamePair={pair}
+            selected={false}
+          />
         ))}
       </List>
     );
