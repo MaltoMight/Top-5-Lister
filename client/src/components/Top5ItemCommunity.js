@@ -14,16 +14,28 @@ export default function Top5ItemCommunity(props) {
       style={{ overflow: "auto", borderRadius: "10px", marginRight: "10px" }}
     >
       {idNamePair.items.map((item) => (
-        <Typography
-          style={{
-            fontSize: "35px",
-            paddingTop: "10px",
-            paddingLeft: "12px",
-            color: "#d5af36",
-          }}
-        >
-          {item.itemName}
-        </Typography>
+        <div>
+          <Typography
+            style={{
+              fontSize: "35px",
+              paddingTop: "10px",
+              paddingLeft: "12px",
+              color: "#d5af36",
+            }}
+          >
+            {item.itemName}
+          </Typography>
+          <Typography
+            style={{
+              fontSize: "15px",
+
+              paddingLeft: "12px",
+              color: "#d5af36",
+            }}
+          >
+            {item.vote} votes
+          </Typography>
+        </div>
       ))}
     </Grid>
   );
