@@ -1,0 +1,9 @@
+{
+  "title": "Top 5 Lister",
+  "description": "It consist in create top 5 choices where users can up vote, down vote, and comment their choices",
+  "repository": "https://github.com/MaltoMight/Top-5-Lister",
+  "technology": 
+  [
+    "Node.Js", "React", "MongoDB", "ExpressJS"
+  ]
+}
